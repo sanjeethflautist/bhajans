@@ -1,54 +1,58 @@
 <template>
-  <nav class="bg-white shadow-md">
+  <nav class="bg-white/90 backdrop-blur-md shadow-lg border-b border-orange-100">
     <div class="container mx-auto px-4">
-      <div class="flex justify-between items-center h-16">
+      <div class="flex justify-between items-center h-18">
         <!-- Logo and Brand -->
-        <RouterLink to="/" class="flex items-center space-x-2">
-          <span class="text-2xl font-bold text-primary-600">🎵</span>
-          <span class="text-xl font-bold text-gray-900">Bhajan Manager</span>
+        <RouterLink to="/" class="flex items-center space-x-3 group">
+          <span class="text-3xl">🎵</span>
+          <span class="text-xl font-bold bg-gradient-to-r from-primary-600 to-accent-500 bg-clip-text text-transparent group-hover:from-primary-700 group-hover:to-accent-600 transition-all">Bhajan Manager</span>
         </RouterLink>
 
         <!-- Navigation Links -->
-        <div class="flex items-center space-x-6">
+        <div class="flex items-center space-x-8">
           <RouterLink
             to="/"
-            class="text-gray-700 hover:text-primary-600 font-medium transition"
+            class="text-gray-600 hover:text-primary-600 font-medium transition-colors relative group py-2"
           >
-            Browse
+            <span>Browse</span>
+            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-600 to-accent-500 group-hover:w-full transition-all duration-300"></span>
           </RouterLink>
 
           <RouterLink
             v-if="authStore.canCreateBhajan"
             to="/my-bhajans"
-            class="text-gray-700 hover:text-primary-600 font-medium transition"
+            class="text-gray-600 hover:text-primary-600 font-medium transition-colors relative group py-2"
           >
-            My Bhajans
+            <span>My Bhajans</span>
+            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-600 to-accent-500 group-hover:w-full transition-all duration-300"></span>
           </RouterLink>
 
           <RouterLink
             v-if="authStore.canCreateBhajan"
             to="/bhajan/create"
-            class="text-gray-700 hover:text-primary-600 font-medium transition"
+            class="text-gray-600 hover:text-primary-600 font-medium transition-colors relative group py-2"
           >
-            Create
+            <span>Create</span>
+            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-600 to-accent-500 group-hover:w-full transition-all duration-300"></span>
           </RouterLink>
 
           <RouterLink
             v-if="authStore.isAdmin"
             to="/admin"
-            class="text-gray-700 hover:text-primary-600 font-medium transition"
+            class="text-gray-600 hover:text-primary-600 font-medium transition-colors relative group py-2"
           >
-            Admin
+            <span>Admin</span>
+            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-600 to-accent-500 group-hover:w-full transition-all duration-300"></span>
           </RouterLink>
 
           <!-- User Menu -->
           <div v-if="authStore.isAuthenticated" class="relative">
             <button
               @click.stop="toggleUserMenu"
-              class="flex items-center space-x-2 text-gray-700 hover:text-primary-600 font-medium transition cursor-pointer"
+              class="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-primary-50 to-accent-50 hover:from-primary-100 hover:to-accent-100 text-gray-700 font-medium transition-all cursor-pointer border border-primary-200"
             >
-              <span>{{ authStore.user?.email || 'User' }}</span>
-              <span class="text-xs bg-primary-100 text-primary-700 px-2 py-1 rounded">
+              <span class="text-sm">{{ authStore.user?.email || 'User' }}</span>
+              <span class="text-xs bg-gradient-to-r from-primary-500 to-accent-500 text-white px-3 py-1 rounded-full font-semibold">
                 {{ authStore.userRole }}
               </span>
               <svg 
@@ -74,11 +78,11 @@
               <div
                 v-if="showUserMenu"
                 @click.stop
-                class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-200"
+                class="absolute right-0 mt-3 w-52 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl py-2 z-50 border border-orange-100"
               >
                 <button
                   @click="handleSignOut"
-                  class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition flex items-center space-x-2"
+                  class="w-full text-left px-4 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-primary-50 hover:to-accent-50 transition-all flex items-center space-x-3 rounded-xl mx-1"
                 >
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

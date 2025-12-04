@@ -179,6 +179,14 @@ CREATE POLICY "Users can view all profiles" ON public.user_profiles
 CREATE POLICY "Users can update own profile" ON public.user_profiles
     FOR UPDATE USING (auth.uid() = id);
 
+CREATE POLICY "Admins can update any profile" ON public.user_profiles
+    FOR UPDATE USING (
+        EXISTS (
+            SELECT 1 FROM public.user_profiles
+            WHERE id = auth.uid() AND role = 'admin'
+        )
+    );
+
 -- Bhajans Policies
 CREATE POLICY "Anyone can view approved bhajans" ON public.bhajans
     FOR SELECT USING (
