@@ -5,6 +5,18 @@
       <p class="text-lg text-gray-600">
         Browse and search through our collection of devotional bhajans
       </p>
+      
+      <!-- Site Statistics -->
+      <div v-if="siteStats" class="mt-4 flex flex-wrap gap-4">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2">
+          <span class="text-sm text-blue-700 font-medium">Total Bhajans:</span>
+          <span class="ml-2 text-lg font-bold text-blue-900">{{ siteStats.total_bhajans || 0 }}</span>
+        </div>
+        <div class="bg-green-50 border border-green-200 rounded-lg px-4 py-2">
+          <span class="text-sm text-green-700 font-medium">Total Views:</span>
+          <span class="ml-2 text-lg font-bold text-green-900">{{ formatNumber(siteStats.total_views || 0) }}</span>
+        </div>
+      </div>
     </div>
 
     <!-- Search and Filters -->
@@ -101,6 +113,9 @@
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Tags
                 </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Views
+                </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -136,6 +151,15 @@
                     >
                       +{{ bhajan.tags.length - 3 }}
                     </span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-600 flex items-center">
+                    <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    {{ formatNumber(bhajan.view_count || 0) }}
                   </div>
                 </td>
               </tr>
@@ -188,6 +212,7 @@ import { RouterLink, useRouter, useRoute } from 'vue-router'
 import { useBhajanStore } from '@/stores/bhajanStore'
 import { useTagStore } from '@/stores/tagStore'
 import { useAuthStore } from '@/stores/authStore'
+import { analyticsService } from '@/services/analyticsService'
 import BhajanCard from '@/components/BhajanCard.vue'
 
 const router = useRouter()
@@ -202,6 +227,7 @@ const sortBy = ref('created_at')
 const currentPage = ref(1)
 const itemsPerPage = 12
 const statusFilter = ref('')
+const siteStats = ref(null)
 
 const loading = computed(() => bhajanStore.loading)
 const error = computed(() => bhajanStore.error)
@@ -276,10 +302,28 @@ function viewBhajan(id) {
   router.push(`/bhajan/${id}`)
 }
 
+function formatNumber(num) {
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1) + 'M'
+  } else if (num >= 1000) {
+    return (num / 1000).toFixed(1) + 'K'
+  }
+  return num.toString()
+}
+
 onMounted(async () => {
   // Check for status filter from query params
   if (route.query.status) {
     statusFilter.value = route.query.status
+  }
+  
+  // Track home page visit
+  await analyticsService.trackHomeVisit()
+  
+  // Fetch site statistics
+  const statsResult = await analyticsService.getSiteStatistics()
+  if (statsResult.data) {
+    siteStats.value = statsResult.data
   }
   
   await tagStore.fetchAllTags()

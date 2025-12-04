@@ -94,6 +94,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { useBhajanStore } from '@/stores/bhajanStore'
 import { useAuthStore } from '@/stores/authStore'
+import { analyticsService } from '@/services/analyticsService'
 import ReportForm from '@/components/ReportForm.vue'
 
 const route = useRoute()
@@ -170,5 +171,10 @@ function handleReportSuccess() {
 
 onMounted(async () => {
   await bhajanStore.fetchBhajanById(route.params.id)
+  
+  // Track view after successfully loading bhajan
+  if (bhajanStore.currentBhajan) {
+    await analyticsService.trackBhajanView(route.params.id)
+  }
 })
 </script>
