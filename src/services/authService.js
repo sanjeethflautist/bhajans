@@ -54,8 +54,9 @@ export const authService = {
       .update({ role })
       .eq('id', userId)
       .select()
-      .single()
-    return { data, error }
+    
+    if (error) return { data: null, error }
+    return { data: data?.[0] || null, error: null }
   },
 
   // Listen to auth changes
