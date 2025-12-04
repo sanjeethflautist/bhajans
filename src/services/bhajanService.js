@@ -1,0 +1,115 @@
+import { supabase } from './supabaseClient'
+
+export const bhajanService = {
+  // Get all bhajans (with filters)
+  async getBhajans({ status, searchQuery, tags, sortBy = 'created_at', sortOrder = 'desc', limit, offset = 0 }) {
+    let query = supabase
+      .from('bhajans')
+      .select(`
+        *,
+        creator:user_profiles!created_by(id, email, role),
+        tags:bhajan_tags(id, tag_name)
+      `, { count: 'exact' })
+
+    if (status) {
+      query = query.eq('status', status)
+    }
+
+    if (searchQuery) {
+      query = query.or(`title.ilike.%${searchQuery}%,lyrics.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`)
+    }
+
+    if (tags && tags.length > 0) {
+      query = query.in('id', 
+        supabase
+          .from('bhajan_tags')
+          .select('bhajan_id')
+          .in('tag_name', tags)
+      )
+    }
+
+    query = query.order(sortBy, { ascending: sortOrder === 'asc' })
+
+    if (limit) {
+      query = query.range(offset, offset + limit - 1)
+    }
+
+    const { data, error, count } = await query
+    return { data, error, count }
+  },
+
+  // Get single bhajan by ID
+  async getBhajanById(id) {
+    const { data, error } = await supabase
+      .from('bhajans')
+      .select(`
+        *,
+        creator:user_profiles!created_by(id, email, role),
+        reviewer:user_profiles!reviewed_by(id, email, role),
+        tags:bhajan_tags(id, tag_name)
+      `)
+      .eq('id', id)
+      .single()
+    return { data, error }
+  },
+
+  // Create new bhajan
+  async createBhajan(bhajanData) {
+    const { data, error } = await supabase
+      .from('bhajans')
+      .insert([bhajanData])
+      .select()
+      .single()
+    return { data, error }
+  },
+
+  // Update bhajan
+  async updateBhajan(id, updates) {
+    const { data, error } = await supabase
+      .from('bhajans')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single()
+    return { data, error }
+  },
+
+  // Delete bhajan
+  async deleteBhajan(id) {
+    const { error } = await supabase
+      .from('bhajans')
+      .delete()
+      .eq('id', id)
+    return { error }
+  },
+
+  // Submit bhajan for review
+  async submitForReview(id) {
+    return this.updateBhajan(id, { status: 'pending_review' })
+  },
+
+  // Approve bhajan (admin only)
+  async approveBhajan(id, reviewedBy, reviewComment) {
+    return this.updateBhajan(id, {
+      status: 'approved',
+      reviewed_by: reviewedBy,
+      reviewed_at: new Date().toISOString(),
+      review_comment: reviewComment
+    })
+  },
+
+  // Reject bhajan (admin only)
+  async rejectBhajan(id, reviewedBy, reviewComment) {
+    return this.updateBhajan(id, {
+      status: 'rejected',
+      reviewed_by: reviewedBy,
+      reviewed_at: new Date().toISOString(),
+      review_comment: reviewComment
+    })
+  },
+
+  // Get bhajans pending review
+  async getPendingReviewBhajans() {
+    return this.getBhajans({ status: 'pending_review' })
+  }
+}
