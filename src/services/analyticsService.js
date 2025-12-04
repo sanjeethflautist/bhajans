@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { supabase } from './supabaseClient'
 
 export const analyticsService = {
   // Increment view count for a bhajan
