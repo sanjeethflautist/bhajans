@@ -32,13 +32,23 @@ export const useAuthStore = defineStore('auth', () => {
 
       // Listen for auth changes
       supabase.auth.onAuthStateChange(async (event, newSession) => {
-        session.value = newSession
-        user.value = newSession?.user || null
+        console.log('Auth state changed:', event, newSession?.user?.email)
         
-        if (newSession?.user) {
-          await fetchUserProfile()
-        } else {
+        // Only update state for certain events
+        if (event === 'SIGNED_OUT') {
+          user.value = null
           profile.value = null
+          session.value = null
+        } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          session.value = newSession
+          user.value = newSession?.user || null
+          
+          if (newSession?.user) {
+            await fetchUserProfile()
+          }
+        } else if (event === 'USER_UPDATED') {
+          session.value = newSession
+          user.value = newSession?.user || null
         }
       })
     } catch (err) {
