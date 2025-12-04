@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="min-h-screen">
-    <Navbar v-if="authStore.user" />
+    <Navbar />
     <main class="container mx-auto px-4 py-8">
       <RouterView />
     </main>
