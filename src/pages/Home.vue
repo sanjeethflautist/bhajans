@@ -108,13 +108,7 @@
                   Title
                 </th>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Details
-                </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Tags
-                </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Views
                 </th>
               </tr>
             </thead>
@@ -129,37 +123,15 @@
                   <div class="text-sm font-medium text-gray-900">{{ bhajan.title }}</div>
                 </td>
                 <td class="px-6 py-4">
-                  <div class="text-sm text-gray-600 max-w-2xl">
-                    <div v-if="bhajan.description" class="mb-2 font-medium">{{ bhajan.description }}</div>
-                    <div class="text-gray-500 line-clamp-3 whitespace-pre-line">
-                      {{ bhajan.lyrics?.substring(0, 150) }}{{ bhajan.lyrics?.length > 150 ? '...' : '' }}
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
                   <div class="flex flex-wrap gap-1">
                     <span 
-                      v-for="tag in bhajan.tags?.slice(0, 3)" 
+                      v-for="(tag, index) in bhajan.tags" 
                       :key="tag"
                       class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800"
                     >
-                      {{ tag }}
+                      {{ tag }}{{ index < bhajan.tags.length - 1 ? ',' : '' }}
                     </span>
-                    <span 
-                      v-if="bhajan.tags?.length > 3"
-                      class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600"
-                    >
-                      +{{ bhajan.tags.length - 3 }}
-                    </span>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-600 flex items-center">
-                    <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    {{ formatNumber(bhajan.view_count || 0) }}
+                    <span v-if="bhajan.tags?.length === 0" class="text-sm text-gray-400">-</span>
                   </div>
                 </td>
               </tr>
