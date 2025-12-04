@@ -80,18 +80,89 @@
       </RouterLink>
     </div>
 
-    <!-- Bhajans Grid -->
+    <!-- Bhajans Table -->
     <div v-else>
       <div class="mb-4 text-gray-600">
         Found {{ bhajanStore.totalCount }} bhajan{{ bhajanStore.totalCount !== 1 ? 's' : '' }}
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <BhajanCard
-          v-for="bhajan in bhajans"
-          :key="bhajan.id"
-          :bhajan="bhajan"
-        />
+      <!-- Table View -->
+      <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Title
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Description
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Tags
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Author
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Date
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr 
+                v-for="bhajan in bhajans" 
+                :key="bhajan.id"
+                @click="viewBhajan(bhajan.id)"
+                class="hover:bg-gray-50 cursor-pointer transition"
+              >
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900">{{ bhajan.title }}</div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="text-sm text-gray-600 max-w-md truncate">
+                    {{ bhajan.description || 'No description' }}
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex flex-wrap gap-1">
+                    <span 
+                      v-for="tag in bhajan.tags?.slice(0, 3)" 
+                      :key="tag"
+                      class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800"
+                    >
+                      {{ tag }}
+                    </span>
+                    <span 
+                      v-if="bhajan.tags?.length > 3"
+                      class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600"
+                    >
+                      +{{ bhajan.tags.length - 3 }}
+                    </span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-600">
+                    {{ bhajan.creator_email?.split('@')[0] || 'Unknown' }}
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-600">
+                    {{ formatDate(bhajan.created_at) }}
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span :class="getStatusClass(bhajan.status)">
+                    {{ formatStatus(bhajan.status) }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <!-- Pagination -->
@@ -134,12 +205,13 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import { useBhajanStore } from '@/stores/bhajanStore'
 import { useTagStore } from '@/stores/tagStore'
 import { useAuthStore } from '@/stores/authStore'
 import BhajanCard from '@/components/BhajanCard.vue'
 
+const router = useRouter()
 const bhajanStore = useBhajanStore()
 const tagStore = useTagStore()
 const authStore = useAuthStore()
@@ -214,6 +286,39 @@ function goToPage(page) {
     currentPage.value = page
     fetchBhajansData()
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
+
+function viewBhajan(id) {
+  router.push(`/bhajan/${id}`)
+}
+
+function formatDate(dateString) {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric', 
+    year: 'numeric' 
+  })
+}
+
+function formatStatus(status) {
+  return status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+}
+
+function getStatusClass(status) {
+  const classes = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium'
+  switch(status) {
+    case 'approved':
+      return `${classes} bg-green-100 text-green-800`
+    case 'pending_review':
+      return `${classes} bg-yellow-100 text-yellow-800`
+    case 'draft':
+      return `${classes} bg-gray-100 text-gray-800`
+    case 'rejected':
+      return `${classes} bg-red-100 text-red-800`
+    default:
+      return `${classes} bg-gray-100 text-gray-800`
   }
 }
 
