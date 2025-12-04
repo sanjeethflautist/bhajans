@@ -106,17 +106,22 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       loading.value = true
       error.value = null
-      const { error: signOutError } = await authService.signOut()
       
-      if (signOutError) throw signOutError
-      
+      // Clear local state first
       user.value = null
       profile.value = null
       session.value = null
       
+      // Then sign out from Supabase
+      await authService.signOut()
+      
       return { success: true }
     } catch (err) {
       error.value = err.message
+      // Still clear state even if there's an error
+      user.value = null
+      profile.value = null
+      session.value = null
       return { success: false, error: err.message }
     } finally {
       loading.value = false

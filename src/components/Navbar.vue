@@ -214,23 +214,14 @@ function closeUserMenu() {
 }
 
 async function handleSignOut() {
-  try {
-    showUserMenu.value = false
-    showMobileMenu.value = false
-    
-    const result = await authStore.signOut()
-    
-    if (result.success !== false) {
-      // Force navigation to login
-      await router.push('/login')
-      // Optionally reload to clear any cached state
-      window.location.reload()
-    }
-  } catch (error) {
-    console.error('Sign out error:', error)
-    // Still try to navigate even if there's an error
-    await router.push('/login')
-  }
+  showUserMenu.value = false
+  showMobileMenu.value = false
+  
+  // Sign out from Supabase
+  await authStore.signOut()
+  
+  // Navigate to home page
+  router.push('/')
 }
 
 // Click outside to close
