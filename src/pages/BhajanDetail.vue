@@ -18,47 +18,11 @@
     <div v-else-if="bhajan">
       <!-- Header -->
       <div class="card mb-6">
-        <div class="flex justify-between items-start mb-4">
-          <div class="flex-1">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ bhajan.title }}</h1>
-            <p v-if="bhajan.description" class="text-lg text-gray-600">
-              {{ bhajan.description }}
-            </p>
-          </div>
-          
-          <!-- Status Badge -->
-          <span
-            :class="statusClasses"
-            class="px-3 py-2 rounded-full text-sm font-medium ml-4"
-          >
-            {{ statusText }}
-          </span>
-        </div>
-
-        <!-- Metadata -->
-        <div class="flex flex-wrap gap-4 text-sm text-gray-600 pt-4 border-t">
-          <div>
-            <span class="font-medium">Created by:</span>
-            {{ bhajan.creator?.email || 'Unknown' }}
-          </div>
-          <div>
-            <span class="font-medium">Created:</span>
-            {{ formatDate(bhajan.created_at) }}
-          </div>
-          <div v-if="bhajan.updated_at !== bhajan.created_at">
-            <span class="font-medium">Updated:</span>
-            {{ formatDate(bhajan.updated_at) }}
-          </div>
-        </div>
-
-        <!-- Review Info -->
-        <div v-if="bhajan.review_comment" class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p class="font-medium text-gray-700 mb-1">Review Comment:</p>
-          <p class="text-gray-600">{{ bhajan.review_comment }}</p>
-          <p v-if="bhajan.reviewer" class="text-sm text-gray-500 mt-2">
-            Reviewed by {{ bhajan.reviewer.email }} on {{ formatDate(bhajan.reviewed_at) }}
-          </p>
-        </div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ bhajan.title }}</h1>
+        
+        <p v-if="bhajan.description" class="text-lg text-gray-600 mb-6">
+          {{ bhajan.description }}
+        </p>
 
         <!-- Action Buttons -->
         <div class="flex flex-wrap gap-3 mt-4 pt-4 border-t">

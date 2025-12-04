@@ -99,16 +99,10 @@
                   Description
                 </th>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Lyrics
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Tags
-                </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Author
-                </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
                 </th>
               </tr>
             </thead>
@@ -119,12 +113,17 @@
                 @click="viewBhajan(bhajan.id)"
                 class="hover:bg-gray-50 cursor-pointer transition"
               >
-                <td class="px-6 py-4 whitespace-nowrap">
+                <td class="px-6 py-4">
                   <div class="text-sm font-medium text-gray-900">{{ bhajan.title }}</div>
                 </td>
                 <td class="px-6 py-4">
-                  <div class="text-sm text-gray-600 max-w-md truncate">
-                    {{ bhajan.description || 'No description' }}
+                  <div class="text-sm text-gray-600 max-w-sm truncate">
+                    {{ bhajan.description || '-' }}
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="text-sm text-gray-600 max-w-md truncate whitespace-pre-line">
+                    {{ bhajan.lyrics?.substring(0, 100) }}{{ bhajan.lyrics?.length > 100 ? '...' : '' }}
                   </div>
                 </td>
                 <td class="px-6 py-4">
@@ -143,21 +142,6 @@
                       +{{ bhajan.tags.length - 3 }}
                     </span>
                   </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-600">
-                    {{ bhajan.creator_email?.split('@')[0] || 'Unknown' }}
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-600">
-                    {{ formatDate(bhajan.created_at) }}
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span :class="getStatusClass(bhajan.status)">
-                    {{ formatStatus(bhajan.status) }}
-                  </span>
                 </td>
               </tr>
             </tbody>
@@ -291,35 +275,6 @@ function goToPage(page) {
 
 function viewBhajan(id) {
   router.push(`/bhajan/${id}`)
-}
-
-function formatDate(dateString) {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', { 
-    month: 'short', 
-    day: 'numeric', 
-    year: 'numeric' 
-  })
-}
-
-function formatStatus(status) {
-  return status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
-}
-
-function getStatusClass(status) {
-  const classes = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium'
-  switch(status) {
-    case 'approved':
-      return `${classes} bg-green-100 text-green-800`
-    case 'pending_review':
-      return `${classes} bg-yellow-100 text-yellow-800`
-    case 'draft':
-      return `${classes} bg-gray-100 text-gray-800`
-    case 'rejected':
-      return `${classes} bg-red-100 text-red-800`
-    default:
-      return `${classes} bg-gray-100 text-gray-800`
-  }
 }
 
 onMounted(async () => {
