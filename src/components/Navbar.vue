@@ -45,6 +45,20 @@
           </RouterLink>
 
           <RouterLink
+            v-if="authStore.canReviewBhajan"
+            to="/admin/review-queue"
+            class="text-gray-600 hover:text-primary-600 font-medium transition-colors relative"
+          >
+            Pending Review
+            <span 
+              v-if="pendingReviewCount > 0" 
+              class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center"
+            >
+              {{ pendingReviewCount }}
+            </span>
+          </RouterLink>
+
+          <RouterLink
             v-if="authStore.isAdmin"
             to="/admin"
             class="text-gray-600 hover:text-primary-600 font-medium transition-colors"
@@ -148,6 +162,21 @@
             </RouterLink>
 
             <RouterLink
+              v-if="authStore.canReviewBhajan"
+              to="/admin/review-queue"
+              @click="closeMobileMenu"
+              class="px-4 py-2 text-gray-600 hover:bg-gray-100 hover:text-primary-600 rounded-lg transition flex items-center justify-between"
+            >
+              <span>Pending Review</span>
+              <span 
+                v-if="pendingReviewCount > 0" 
+                class="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center"
+              >
+                {{ pendingReviewCount }}
+              </span>
+            </RouterLink>
+
+            <RouterLink
               v-if="authStore.isAdmin"
               to="/admin"
               @click="closeMobileMenu"
@@ -191,11 +220,14 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
+import { useBhajanStore } from '@/stores/bhajanStore'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const bhajanStore = useBhajanStore()
 const showUserMenu = ref(false)
 const showMobileMenu = ref(false)
+const pendingReviewCount = ref(0)
 
 function toggleUserMenu() {
   showUserMenu.value = !showUserMenu.value
@@ -232,8 +264,22 @@ function handleClickOutside(event) {
   }
 }
 
+async function updatePendingReviewCount() {
+  if (authStore.canReviewBhajan) {
+    pendingReviewCount.value = await bhajanStore.getPendingReviewCount()
+  }
+}
+
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+  updatePendingReviewCount()
+  
+  // Update count every 30 seconds
+  const interval = setInterval(updatePendingReviewCount, 30000)
+  
+  onUnmounted(() => {
+    clearInterval(interval)
+  })
 })
 
 onUnmounted(() => {

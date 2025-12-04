@@ -96,10 +96,7 @@
                   Title
                 </th>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Description
-                </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Lyrics
+                  Details
                 </th>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Tags
@@ -117,13 +114,11 @@
                   <div class="text-sm font-medium text-gray-900">{{ bhajan.title }}</div>
                 </td>
                 <td class="px-6 py-4">
-                  <div class="text-sm text-gray-600 max-w-sm truncate">
-                    {{ bhajan.description || '-' }}
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="text-sm text-gray-600 max-w-md truncate whitespace-pre-line">
-                    {{ bhajan.lyrics?.substring(0, 100) }}{{ bhajan.lyrics?.length > 100 ? '...' : '' }}
+                  <div class="text-sm text-gray-600 max-w-2xl">
+                    <div v-if="bhajan.description" class="mb-2 font-medium">{{ bhajan.description }}</div>
+                    <div class="text-gray-500 line-clamp-3 whitespace-pre-line">
+                      {{ bhajan.lyrics?.substring(0, 150) }}{{ bhajan.lyrics?.length > 150 ? '...' : '' }}
+                    </div>
                   </div>
                 </td>
                 <td class="px-6 py-4">
@@ -189,13 +184,14 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
+import { RouterLink, useRouter, useRoute } from 'vue-router'
 import { useBhajanStore } from '@/stores/bhajanStore'
 import { useTagStore } from '@/stores/tagStore'
 import { useAuthStore } from '@/stores/authStore'
 import BhajanCard from '@/components/BhajanCard.vue'
 
 const router = useRouter()
+const route = useRoute()
 const bhajanStore = useBhajanStore()
 const tagStore = useTagStore()
 const authStore = useAuthStore()
@@ -205,6 +201,7 @@ const selectedTag = ref('')
 const sortBy = ref('created_at')
 const currentPage = ref(1)
 const itemsPerPage = 12
+const statusFilter = ref('')
 
 const loading = computed(() => bhajanStore.loading)
 const error = computed(() => bhajanStore.error)
@@ -246,7 +243,7 @@ function debouncedSearch() {
 
 async function fetchBhajansData() {
   const filters = {
-    status: authStore.isEditor ? undefined : 'approved',
+    status: statusFilter.value || (authStore.isEditor ? undefined : 'approved'),
     searchQuery: searchQuery.value,
     tags: selectedTag.value ? [selectedTag.value] : undefined,
     sortBy: sortBy.value,
@@ -261,7 +258,9 @@ async function fetchBhajansData() {
 function clearFilters() {
   searchQuery.value = ''
   selectedTag.value = ''
+  statusFilter.value = ''
   currentPage.value = 1
+  router.push('/')
   fetchBhajansData()
 }
 
@@ -278,6 +277,11 @@ function viewBhajan(id) {
 }
 
 onMounted(async () => {
+  // Check for status filter from query params
+  if (route.query.status) {
+    statusFilter.value = route.query.status
+  }
+  
   await tagStore.fetchAllTags()
   await fetchBhajansData()
 })

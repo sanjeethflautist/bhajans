@@ -245,6 +245,24 @@ export const useBhajanStore = defineStore('bhajan', () => {
     return fetchBhajans({ status: 'pending_review' })
   }
 
+  // Get pending review count
+  async function getPendingReviewCount() {
+    try {
+      const { data, error: fetchError, count } = await bhajanService.getBhajans({
+        status: 'pending_review',
+        limit: 1,
+        offset: 0
+      })
+      
+      if (fetchError) throw fetchError
+      
+      return count || 0
+    } catch (err) {
+      console.error('Error fetching pending review count:', err)
+      return 0
+    }
+  }
+
   return {
     // State
     bhajans,
@@ -261,6 +279,7 @@ export const useBhajanStore = defineStore('bhajan', () => {
     submitForReview,
     approveBhajan,
     rejectBhajan,
-    fetchPendingReviews
+    fetchPendingReviews,
+    getPendingReviewCount
   }
 })

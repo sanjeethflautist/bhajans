@@ -81,9 +81,8 @@
 
       <!-- Lyrics -->
       <div class="card">
-        <h3 class="text-lg font-bold text-gray-900 mb-4">Lyrics</h3>
         <div class="bg-gray-50 p-6 rounded-lg">
-          <pre class="whitespace-pre-wrap font-serif text-gray-800 leading-relaxed">{{ bhajan.lyrics }}</pre>
+          <pre class="whitespace-pre-wrap font-serif text-gray-800 leading-relaxed text-lg">{{ bhajan.lyrics }}</pre>
         </div>
       </div>
     </div>

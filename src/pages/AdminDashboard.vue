@@ -18,7 +18,10 @@
       <!-- Stats Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <!-- Approved Bhajans -->
-        <div class="card bg-green-50 border border-green-200">
+        <div 
+          @click="goToApprovedBhajans"
+          class="card bg-green-50 border border-green-200 cursor-pointer hover:shadow-lg transition-shadow"
+        >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-green-700 mb-1">Approved</p>
@@ -29,7 +32,10 @@
         </div>
 
         <!-- Pending Reviews -->
-        <div class="card bg-yellow-50 border border-yellow-200">
+        <div 
+          @click="goToReviewQueue"
+          class="card bg-yellow-50 border border-yellow-200 cursor-pointer hover:shadow-lg transition-shadow"
+        >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-yellow-700 mb-1">Pending Review</p>
@@ -199,6 +205,10 @@ const users = ref([])
 
 function goToReviewQueue() {
   router.push('/admin/review-queue')
+}
+
+function goToApprovedBhajans() {
+  router.push('/?status=approved')
 }
 
 function goToReports() {
