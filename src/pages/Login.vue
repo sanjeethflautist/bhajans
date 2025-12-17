@@ -39,6 +39,15 @@
           />
         </div>
 
+        <div class="flex items-center justify-end">
+          <RouterLink 
+            to="/forgot-password" 
+            class="text-sm text-primary-600 hover:text-primary-700 font-medium"
+          >
+            Forgot password?
+          </RouterLink>
+        </div>
+
         <button
           type="submit"
           :disabled="loading"

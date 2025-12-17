@@ -5,6 +5,8 @@ import { useAuthStore } from '@/stores/authStore'
 const Home = () => import('@/pages/Home.vue')
 const Login = () => import('@/pages/Login.vue')
 const Signup = () => import('@/pages/Signup.vue')
+const ForgotPassword = () => import('@/pages/ForgotPassword.vue')
+const ResetPassword = () => import('@/pages/ResetPassword.vue')
 const BhajanDetail = () => import('@/pages/BhajanDetail.vue')
 const BhajanCreate = () => import('@/pages/BhajanCreate.vue')
 const BhajanEdit = () => import('@/pages/BhajanEdit.vue')
@@ -31,6 +33,18 @@ const routes = [
     name: 'Signup',
     component: Signup,
     meta: { requiresAuth: false, guestOnly: true }
+  },
+  {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: ForgotPassword,
+    meta: { requiresAuth: false, guestOnly: true }
+  },
+  {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: ResetPassword,
+    meta: { requiresAuth: false }
   },
   {
     path: '/bhajan/:id',
