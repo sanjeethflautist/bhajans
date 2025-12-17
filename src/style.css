@@ -4,28 +4,53 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-gradient-to-br from-gray-50 via-white to-primary-50/20 text-gray-900 min-h-screen;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2.5 px-5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200;
+    @apply bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 text-white font-semibold py-2.5 px-5 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200;
   }
   
   .btn-secondary {
-    @apply bg-white hover:bg-gray-50 text-gray-700 font-medium py-2.5 px-5 rounded-lg border border-gray-300 hover:border-gray-400 transition-all duration-200;
+    @apply bg-white hover:bg-gradient-to-r hover:from-gray-50 hover:to-primary-50 text-gray-700 font-medium py-2.5 px-5 rounded-xl border border-gray-300 hover:border-primary-400 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 transition-all duration-200;
   }
   
   .btn-danger {
-    @apply bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 px-5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200;
+    @apply bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white font-semibold py-2.5 px-5 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200;
   }
   
   .input-field {
-    @apply w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white transition-all duration-200;
+    @apply w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white shadow-sm focus:shadow-md transition-all duration-200;
   }
   
   .card {
-    @apply bg-white rounded-lg shadow-md hover:shadow-lg p-6 transition-shadow duration-200 border border-gray-200;
+    @apply bg-white rounded-xl shadow-md hover:shadow-xl p-5 sm:p-6 transition-all duration-300 border border-gray-100 hover:border-primary-200 transform hover:-translate-y-1;
+  }
+  
+  /* Modern glassmorphism effect */
+  .glass {
+    @apply bg-white/80 backdrop-blur-lg border border-white/20 shadow-xl;
+  }
+  
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent;
+  }
+  
+  /* Custom scrollbar for webkit browsers */
+  @supports selector(::-webkit-scrollbar) {
+    ::-webkit-scrollbar {
+      @apply w-2 h-2;
+    }
+    
+    ::-webkit-scrollbar-track {
+      @apply bg-gray-100 rounded-full;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      @apply bg-primary-400 rounded-full hover:bg-primary-500;
+    }
   }
 }

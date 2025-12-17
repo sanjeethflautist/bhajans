@@ -3,6 +3,7 @@ import { useAuthStore } from '@/stores/authStore'
 
 // Lazy load pages for better performance
 const Home = () => import('@/pages/Home.vue')
+const About = () => import('@/pages/About.vue')
 const Login = () => import('@/pages/Login.vue')
 const Signup = () => import('@/pages/Signup.vue')
 const ForgotPassword = () => import('@/pages/ForgotPassword.vue')
@@ -20,6 +21,12 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home,
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/about',
+    name: 'About',
+    component: About,
     meta: { requiresAuth: false }
   },
   {

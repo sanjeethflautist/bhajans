@@ -1,37 +1,44 @@
 <template>
-  <nav class="bg-white shadow-md sticky top-0 z-50">
-    <div class="container mx-auto px-4">
-      <div class="flex justify-between items-center h-16">
+  <nav class="glass sticky top-0 z-50 border-b border-white/20 shadow-lg backdrop-blur-xl">
+    <div class="container mx-auto px-3 sm:px-4">
+      <div class="flex justify-between items-center h-14 sm:h-16">
         <!-- Logo and Brand -->
-        <RouterLink to="/" class="flex items-center space-x-2">
-          <span class="text-2xl">🎵</span>
-          <span class="text-lg sm:text-xl font-bold text-gray-800">Bhajans</span>
+        <RouterLink to="/" class="flex items-center space-x-2 group">
+          <span class="text-2xl transform group-hover:scale-110 transition-transform">🎵</span>
+          <span class="text-lg sm:text-xl font-bold gradient-text">Bhajans</span>
         </RouterLink>
 
         <!-- Mobile Menu Button -->
         <button 
           @click="toggleMobileMenu"
-          class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition"
+          class="md:hidden p-2 rounded-xl hover:bg-white/50 transition-all duration-200"
         >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path v-if="!showMobileMenu" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
             <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
 
         <!-- Desktop Navigation Links -->
-        <div class="hidden md:flex items-center space-x-6">
+        <div class="hidden md:flex items-center space-x-4 lg:space-x-6">
           <RouterLink
             to="/"
-            class="text-gray-600 hover:text-primary-600 font-medium transition-colors"
+            class="text-gray-700 hover:text-primary-600 font-medium transition-all duration-200 hover:scale-105"
           >
             Browse
           </RouterLink>
 
           <RouterLink
+            to="/about"
+            class="text-gray-700 hover:text-primary-600 font-medium transition-all duration-200 hover:scale-105"
+          >
+            About
+          </RouterLink>
+
+          <RouterLink
             v-if="authStore.canCreateBhajan"
             to="/my-bhajans"
-            class="text-gray-600 hover:text-primary-600 font-medium transition-colors"
+            class="text-gray-700 hover:text-primary-600 font-medium transition-all duration-200 hover:scale-105"
           >
             My Bhajans
           </RouterLink>
@@ -39,7 +46,7 @@
           <RouterLink
             v-if="authStore.canCreateBhajan"
             to="/bhajan/create"
-            class="text-gray-600 hover:text-primary-600 font-medium transition-colors"
+            class="text-gray-700 hover:text-primary-600 font-medium transition-all duration-200 hover:scale-105"
           >
             Create
           </RouterLink>
@@ -47,12 +54,12 @@
           <RouterLink
             v-if="authStore.canReviewBhajan"
             to="/admin/review-queue"
-            class="text-gray-600 hover:text-primary-600 font-medium transition-colors relative"
+            class="text-gray-700 hover:text-primary-600 font-medium transition-all duration-200 hover:scale-105 relative"
           >
-            Pending Review
+            Review
             <span 
               v-if="pendingReviewCount > 0" 
-              class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center"
+              class="absolute -top-2 -right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse shadow-lg"
             >
               {{ pendingReviewCount }}
             </span>
@@ -61,7 +68,7 @@
           <RouterLink
             v-if="authStore.isAdmin"
             to="/admin"
-            class="text-gray-600 hover:text-primary-600 font-medium transition-colors"
+            class="text-gray-700 hover:text-primary-600 font-medium transition-all duration-200 hover:scale-105"
           >
             Admin
           </RouterLink>
@@ -70,7 +77,7 @@
           <div class="relative">
             <button
               @click.stop="togglePreferencesMenu"
-              class="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-600 hover:text-primary-600"
+              class="p-2 rounded-xl hover:bg-white/50 transition-all duration-200 text-gray-700 hover:text-primary-600 transform hover:scale-110"
               title="Display preferences"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,36 +88,41 @@
 
             <!-- Preferences Dropdown -->
             <Transition
-              enter-active-class="transition ease-out duration-100"
-              enter-from-class="transform opacity-0 scale-95"
-              enter-to-class="transform opacity-100 scale-100"
-              leave-active-class="transition ease-in duration-75"
-              leave-from-class="transform opacity-100 scale-100"
-              leave-to-class="transform opacity-0 scale-95"
+              enter-active-class="transition ease-out duration-200"
+              enter-from-class="transform opacity-0 scale-95 -translate-y-2"
+              enter-to-class="transform opacity-100 scale-100 translate-y-0"
+              leave-active-class="transition ease-in duration-150"
+              leave-from-class="transform opacity-100 scale-100 translate-y-0"
+              leave-to-class="transform opacity-0 scale-95 -translate-y-2"
             >
               <div
                 v-if="showPreferencesMenu"
                 @click.stop
-                class="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-xl py-3 z-50 border border-gray-200"
+                class="absolute right-0 mt-2 w-72 glass rounded-2xl shadow-2xl py-3 z-50 border border-white/20"
               >
-                <div class="px-4 py-2 border-b border-gray-200">
-                  <h3 class="font-semibold text-gray-800">Display Preferences</h3>
+                <div class="px-4 py-2 border-b border-gray-200/50">
+                  <h3 class="font-semibold text-gray-800 flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-primary-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                    </svg>
+                    Display Preferences
+                  </h3>
                 </div>
                 
                 <!-- Script Selection -->
-                <div class="px-4 py-3 border-b border-gray-200">
+                <div class="px-4 py-3 border-b border-gray-200/50">
                   <label class="block text-sm font-medium text-gray-700 mb-2">Script Options</label>
                   <div class="space-y-2">
                     <label
                       v-for="script in preferencesStore.scriptOptions"
                       :key="script.id"
-                      class="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded"
+                      class="flex items-center space-x-2 cursor-pointer hover:bg-white/50 p-2 rounded-lg transition-colors"
                     >
                       <input
                         type="checkbox"
                         :checked="preferencesStore.isScriptEnabled(script.id)"
                         @change="preferencesStore.toggleScript(script.id)"
-                        class="w-4 h-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500"
+                        class="w-4 h-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500 focus:ring-offset-0"
                       />
                       <span class="text-sm text-gray-700">{{ script.label }}</span>
                     </label>
@@ -119,18 +131,18 @@
 
                 <!-- Show Meaning Toggle -->
                 <div class="px-4 py-3">
-                  <label class="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded">
+                  <label class="flex items-center justify-between cursor-pointer hover:bg-white/50 p-2 rounded-lg transition-colors">
                     <span class="text-sm font-medium text-gray-700">Show Meaning</span>
                     <button
                       @click="preferencesStore.toggleMeaning()"
                       :class="[
-                        'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
-                        preferencesStore.showMeaning ? 'bg-primary-600' : 'bg-gray-300'
+                        'relative inline-flex h-6 w-11 items-center rounded-full transition-colors shadow-inner',
+                        preferencesStore.showMeaning ? 'bg-gradient-to-r from-primary-600 to-purple-600' : 'bg-gray-300'
                       ]"
                     >
                       <span
                         :class="[
-                          'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+                          'inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-md',
                           preferencesStore.showMeaning ? 'translate-x-6' : 'translate-x-1'
                         ]"
                       />
@@ -145,10 +157,10 @@
           <div v-if="authStore.isAuthenticated" class="relative">
             <button
               @click.stop="toggleUserMenu"
-              class="flex items-center space-x-2 px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium transition-all cursor-pointer"
+              class="flex items-center space-x-2 px-3 py-2 rounded-xl glass hover:bg-white/50 text-gray-700 font-medium transition-all cursor-pointer shadow-sm hover:shadow-md"
             >
               <span class="text-sm truncate max-w-[100px]">{{ authStore.user?.email || 'User' }}</span>
-              <span class="text-xs bg-primary-600 text-white px-2 py-1 rounded font-medium">
+              <span class="text-xs bg-gradient-to-r from-primary-600 to-purple-600 text-white px-2 py-1 rounded-full font-medium shadow-sm">
                 {{ authStore.userRole }}
               </span>
               <svg 
@@ -164,26 +176,26 @@
 
             <!-- Dropdown Menu -->
             <Transition
-              enter-active-class="transition ease-out duration-100"
-              enter-from-class="transform opacity-0 scale-95"
-              enter-to-class="transform opacity-100 scale-100"
-              leave-active-class="transition ease-in duration-75"
-              leave-from-class="transform opacity-100 scale-100"
-              leave-to-class="transform opacity-0 scale-95"
+              enter-active-class="transition ease-out duration-200"
+              enter-from-class="transform opacity-0 scale-95 -translate-y-2"
+              enter-to-class="transform opacity-100 scale-100 translate-y-0"
+              leave-active-class="transition ease-in duration-150"
+              leave-from-class="transform opacity-100 scale-100 translate-y-0"
+              leave-to-class="transform opacity-0 scale-95 -translate-y-2"
             >
               <div
                 v-if="showUserMenu"
                 @click.stop
-                class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-50 border border-gray-200"
+                class="absolute right-0 mt-2 w-48 glass rounded-2xl shadow-2xl py-2 z-50 border border-white/20"
               >
                 <button
                   @click="handleSignOut"
-                  class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition flex items-center space-x-2"
+                  class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 transition-all rounded-lg mx-2 my-1 flex items-center space-x-2 group"
                 >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-5 h-5 group-hover:text-red-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                   </svg>
-                  <span>Sign Out</span>
+                  <span class="group-hover:text-red-600 transition-colors">Sign Out</span>
                 </button>
               </div>
             </Transition>
@@ -216,6 +228,14 @@
               class="px-4 py-2 text-gray-600 hover:bg-gray-100 hover:text-primary-600 rounded-lg transition"
             >
               Browse
+            </RouterLink>
+
+            <RouterLink
+              to="/about"
+              @click="closeMobileMenu"
+              class="px-4 py-2 text-gray-600 hover:bg-gray-100 hover:text-primary-600 rounded-lg transition"
+            >
+              About
             </RouterLink>
 
             <RouterLink

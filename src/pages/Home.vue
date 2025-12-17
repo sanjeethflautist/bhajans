@@ -1,26 +1,25 @@
 <template>
-  <div class="max-w-7xl mx-auto">
-    <div class="mb-8">
-      <h1 class="text-4xl font-bold text-gray-900 mb-4">Bhajan Collection</h1>
-      <p class="text-lg text-gray-600">
+  <div class="max-w-7xl mx-auto px-3 sm:px-6">
+    <div class="mb-6 sm:mb-8">
+      <p class="text-base sm:text-lg text-gray-600">
         Browse and search through our collection of devotional bhajans
       </p>
       
       <!-- Site Statistics -->
-      <div v-if="siteStats" class="mt-4 flex flex-wrap gap-4">
-        <div class="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2">
+      <div v-if="siteStats" class="mt-4 flex flex-wrap gap-3">
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/50 rounded-xl px-4 py-2 shadow-sm hover:shadow-md transition-shadow">
           <span class="text-sm text-blue-700 font-medium">Total Bhajans:</span>
-          <span class="ml-2 text-lg font-bold text-blue-900">{{ siteStats.total_bhajans || 0 }}</span>
+          <span class="ml-2 text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">{{ siteStats.total_bhajans || 0 }}</span>
         </div>
-        <div class="bg-green-50 border border-green-200 rounded-lg px-4 py-2">
+        <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200/50 rounded-xl px-4 py-2 shadow-sm hover:shadow-md transition-shadow">
           <span class="text-sm text-green-700 font-medium">Total Views:</span>
-          <span class="ml-2 text-lg font-bold text-green-900">{{ formatNumber(siteStats.total_bhajan_views || 0) }}</span>
+          <span class="ml-2 text-lg font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">{{ formatNumber(siteStats.total_bhajan_views || 0) }}</span>
         </div>
       </div>
     </div>
 
     <!-- Search and Filters -->
-    <div class="card mb-8">
+    <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-4 sm:p-6 mb-6">
       <div class="space-y-4">
         <!-- Search Bar -->
         <div>
@@ -34,7 +33,7 @@
         </div>
 
         <!-- Filters Row -->
-        <div class="flex flex-wrap gap-4">
+        <div class="flex flex-wrap gap-3">
           <!-- Tag Filter -->
           <div class="flex-1 min-w-[200px]">
             <select v-model="selectedTag" class="input-field" @change="fetchBhajansData">
@@ -92,51 +91,44 @@
       </RouterLink>
     </div>
 
-    <!-- Bhajans Table -->
+    <!-- Bhajans Grid -->
     <div v-else>
-      <div class="mb-4 text-gray-600">
+      <div class="mb-4 text-gray-600 font-medium">
         Found {{ bhajanStore.totalCount }} bhajan{{ bhajanStore.totalCount !== 1 ? 's' : '' }}
       </div>
 
-      <!-- Table View -->
-      <div class="card overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Title
-                </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tags
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr 
-                v-for="bhajan in bhajans" 
-                :key="bhajan.id"
-                @click="viewBhajan(bhajan.id)"
-                class="hover:bg-gray-50 cursor-pointer transition"
-              >
-                <td class="px-6 py-4">
-                  <div class="text-sm font-medium text-gray-900">{{ bhajan.title }}</div>
-                </td>
-                <td class="px-6 py-4">
-                  <div class="flex flex-wrap gap-1">
-                    <span 
-                      v-for="tag in bhajan.tags" 
-                      :key="tag.id || tag.tag_name"
-                      class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800"
-                    >
-                      {{ tag.tag_name }}
-                    </span>
-                    <span v-if="!bhajan.tags || bhajan.tags.length === 0" class="text-sm text-gray-400">No tags</span>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      <!-- Grid View -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div
+          v-for="bhajan in bhajans"
+          :key="bhajan.id"
+          @click="viewBhajan(bhajan.id)"
+          class="bg-white rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 hover:border-primary-200 p-4 sm:p-5 cursor-pointer transform hover:-translate-y-2 transition-all duration-300 group"
+        >
+          <div class="mb-3">
+            <h3 class="text-lg sm:text-xl font-bold text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-2">{{ bhajan.title }}</h3>
+          </div>
+          <div v-if="bhajan.tags && bhajan.tags.length > 0" class="flex flex-wrap gap-1.5">
+            <span
+              v-for="tag in bhajan.tags.slice(0, 3)"
+              :key="tag.id || tag.tag_name"
+              class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-primary-50 to-purple-50 text-primary-700 border border-primary-200"
+            >
+              {{ tag.tag_name }}
+            </span>
+            <span v-if="bhajan.tags.length > 3" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium text-gray-500">
+              +{{ bhajan.tags.length - 3 }}
+            </span>
+          </div>
+          <div v-else class="text-sm text-gray-400 italic">No tags</div>
+          
+          <!-- Hover indicator -->
+          <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
+            <span class="text-sm text-primary-600 font-medium">View details</span>
+            <svg class="w-4 h-4 text-primary-600 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
         </div>
       </div>
 
