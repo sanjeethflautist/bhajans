@@ -155,8 +155,8 @@
                     :class="[
                       'px-2 py-1 rounded-full text-xs font-medium',
                       user.role === 'admin' ? 'bg-purple-100 text-purple-700' :
-                      user.role === 'editor' ? 'bg-blue-100 text-blue-700' :
-                      'bg-gray-100 text-gray-700'
+                      user.role === 'reviewer' ? 'bg-blue-100 text-blue-700' :
+                      'bg-green-100 text-green-700'
                     ]"
                   >
                     {{ user.role }}
@@ -172,8 +172,8 @@
                     @change="updateUserRole(user.id, $event.target.value)"
                     class="text-sm border-gray-300 rounded"
                   >
-                    <option value="user">User</option>
-                    <option value="editor">Editor</option>
+                    <option value="contributor">Contributor</option>
+                    <option value="reviewer">Reviewer</option>
                     <option value="admin">Admin</option>
                   </select>
                   <span v-else class="text-gray-500 text-xs">You</span>

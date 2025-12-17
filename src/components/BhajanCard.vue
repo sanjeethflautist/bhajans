@@ -147,7 +147,7 @@ const statusText = computed(() => {
 })
 
 const canEdit = computed(() => {
-  return authStore.isEditor && 
+  return authStore.isAuthenticated && 
     (authStore.isAdmin || authStore.user?.id === props.bhajan.created_by)
 })
 
@@ -156,7 +156,7 @@ const canDelete = computed(() => {
 })
 
 const canSubmitReview = computed(() => {
-  return authStore.isEditor && authStore.user?.id === props.bhajan.created_by
+  return authStore.isAuthenticated && authStore.user?.id === props.bhajan.created_by
 })
 
 function navigateToBhajan() {

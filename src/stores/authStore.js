@@ -12,11 +12,12 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Computed properties
   const isAuthenticated = computed(() => !!user.value)
-  const userRole = computed(() => profile.value?.role || 'user')
+  const userRole = computed(() => profile.value?.role || 'contributor')
   const isAdmin = computed(() => userRole.value === 'admin')
-  const isEditor = computed(() => userRole.value === 'editor' || userRole.value === 'admin')
-  const canCreateBhajan = computed(() => isEditor.value)
-  const canReview = computed(() => isAdmin.value)
+  const isReviewer = computed(() => userRole.value === 'reviewer' || userRole.value === 'admin')
+  const isContributor = computed(() => !!user.value) // Everyone who is logged in
+  const canCreateBhajan = computed(() => isContributor.value)
+  const canReviewBhajan = computed(() => isReviewer.value)
 
   // Initialize auth state
   async function initializeAuth() {
@@ -167,9 +168,10 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     userRole,
     isAdmin,
-    isEditor,
+    isReviewer,
+    isContributor,
     canCreateBhajan,
-    canReview,
+    canReviewBhajan,
     // Actions
     initializeAuth,
     fetchUserProfile,

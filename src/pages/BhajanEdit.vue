@@ -80,8 +80,7 @@ onMounted(async () => {
   
   // Check permissions
   if (bhajan.value) {
-    const canEdit = authStore.isAdmin || 
-      (authStore.isEditor && authStore.user.id === bhajan.value.created_by)
+    const canEdit = authStore.isAdmin || authStore.user.id === bhajan.value.created_by
     
     if (!canEdit) {
       alert('You do not have permission to edit this bhajan')

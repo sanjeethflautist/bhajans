@@ -241,7 +241,7 @@ function debouncedSearch() {
 
 async function fetchBhajansData() {
   const filters = {
-    status: statusFilter.value || (authStore.isEditor ? undefined : 'approved'),
+    status: statusFilter.value || (!authStore.isReviewer ? 'approved' : undefined),
     searchQuery: searchQuery.value,
     tags: selectedTag.value ? [selectedTag.value] : undefined,
     sortBy: sortBy.value,
@@ -252,7 +252,7 @@ async function fetchBhajansData() {
 
   console.log('Fetching bhajans with filters:', filters)
   console.log('Auth store state:', { 
-    isEditor: authStore.isEditor, 
+    isReviewer: authStore.isReviewer, 
     isAuthenticated: authStore.isAuthenticated,
     user: authStore.user 
   })

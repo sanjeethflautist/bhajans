@@ -189,8 +189,7 @@ const statusText = computed(() => {
 
 const canEdit = computed(() => {
   if (!authStore.isAuthenticated || !bhajan.value) return false
-  return authStore.isAdmin || 
-    (authStore.isEditor && authStore.user.id === bhajan.value.created_by)
+  return authStore.isAdmin || authStore.user.id === bhajan.value.created_by
 })
 
 const canDelete = computed(() => {

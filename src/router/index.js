@@ -56,19 +56,19 @@ const routes = [
     path: '/bhajan/create',
     name: 'BhajanCreate',
     component: BhajanCreate,
-    meta: { requiresAuth: true, requiresEditor: true }
+    meta: { requiresAuth: true }
   },
   {
     path: '/bhajan/:id/edit',
     name: 'BhajanEdit',
     component: BhajanEdit,
-    meta: { requiresAuth: true, requiresEditor: true }
+    meta: { requiresAuth: true }
   },
   {
     path: '/my-bhajans',
     name: 'MyBhajans',
     component: MyBhajans,
-    meta: { requiresAuth: true, requiresEditor: true }
+    meta: { requiresAuth: true }
   },
   {
     path: '/admin',
@@ -80,13 +80,13 @@ const routes = [
     path: '/admin/review-queue',
     name: 'ReviewQueue',
     component: ReviewQueue,
-    meta: { requiresAuth: true, requiresAdmin: true }
+    meta: { requiresAuth: true, requiresReviewer: true }
   },
   {
     path: '/admin/reports',
     name: 'ReportsPage',
     component: ReportsPage,
-    meta: { requiresAuth: true, requiresAdmin: true }
+    meta: { requiresAuth: true, requiresReviewer: true }
   }
 ]
 
@@ -105,7 +105,7 @@ router.beforeEach(async (to, from, next) => {
   }
 
   const requiresAuth = to.meta.requiresAuth
-  const requiresEditor = to.meta.requiresEditor
+  const requiresReviewer = to.meta.requiresReviewer
   const requiresAdmin = to.meta.requiresAdmin
   const guestOnly = to.meta.guestOnly
 
@@ -122,8 +122,8 @@ router.beforeEach(async (to, from, next) => {
     })
   }
 
-  // Check editor role
-  if (requiresEditor && !authStore.isEditor) {
+  // Check reviewer role
+  if (requiresReviewer && !authStore.isReviewer) {
     return next('/')
   }
 
