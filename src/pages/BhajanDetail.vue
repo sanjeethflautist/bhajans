@@ -255,7 +255,7 @@ function handleReportSuccess() {
 
 async function handleFavoriteClick() {
   if (!authStore.isAuthenticated) {
-    if (confirm('You need to be logged in to add favorites. Would you like to log in now?')) {
+    if (confirm('You need to be logged in to add favorites.\n\nClick OK to log in now.')) {
       router.push('/login')
     }
     return
