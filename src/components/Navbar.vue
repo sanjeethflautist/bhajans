@@ -37,6 +37,14 @@
           </RouterLink>
 
           <RouterLink
+            v-if="authStore.isAuthenticated"
+            to="/my-favorites"
+            class="text-gray-700 hover:text-primary-600 font-medium transition-all duration-200 hover:scale-105"
+          >
+            Favorites
+          </RouterLink>
+
+          <RouterLink
             v-if="authStore.canCreateBhajan"
             to="/bhajan/create"
             class="text-gray-700 hover:text-primary-600 font-medium transition-all duration-200 hover:scale-105"
@@ -291,6 +299,15 @@
               class="px-4 py-2 text-gray-600 hover:bg-gray-100 hover:text-primary-600 rounded-lg transition"
             >
               My Bhajans
+            </RouterLink>
+
+            <RouterLink
+              v-if="authStore.isAuthenticated"
+              to="/my-favorites"
+              @click="closeMobileMenu"
+              class="px-4 py-2 text-gray-600 hover:bg-gray-100 hover:text-primary-600 rounded-lg transition"
+            >
+              Favorites
             </RouterLink>
 
             <RouterLink

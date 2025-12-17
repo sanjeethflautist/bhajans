@@ -99,37 +99,11 @@
 
       <!-- Grid View -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        <div
+        <BhajanCard
           v-for="bhajan in bhajans"
           :key="bhajan.id"
-          @click="viewBhajan(bhajan.id)"
-          class="bg-white rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 hover:border-primary-200 p-4 sm:p-5 cursor-pointer transform hover:-translate-y-2 transition-all duration-300 group"
-        >
-          <div class="mb-3">
-            <h3 class="text-lg sm:text-xl font-bold text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-2">{{ bhajan.title }}</h3>
-          </div>
-          <div v-if="bhajan.tags && bhajan.tags.length > 0" class="flex flex-wrap gap-1.5">
-            <span
-              v-for="tag in bhajan.tags.slice(0, 3)"
-              :key="tag.id || tag.tag_name"
-              class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-primary-50 to-purple-50 text-primary-700 border border-primary-200"
-            >
-              {{ tag.tag_name }}
-            </span>
-            <span v-if="bhajan.tags.length > 3" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium text-gray-500">
-              +{{ bhajan.tags.length - 3 }}
-            </span>
-          </div>
-          <div v-else class="text-sm text-gray-400 italic">No tags</div>
-          
-          <!-- Hover indicator -->
-          <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
-            <span class="text-sm text-primary-600 font-medium">View details</span>
-            <svg class="w-4 h-4 text-primary-600 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
-        </div>
+          :bhajan="bhajan"
+        />
       </div>
 
       <!-- Pagination -->

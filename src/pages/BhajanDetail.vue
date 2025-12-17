@@ -17,8 +17,20 @@
     <!-- Bhajan Content -->
     <div v-else-if="bhajan" class="space-y-4">
       <!-- Header Card with Gradient -->
-      <div class="bg-gradient-to-br from-primary-50 to-purple-50 rounded-2xl shadow-lg p-4 sm:p-6 border border-primary-100">
-        <h1 class="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent mb-3">{{ bhajan.title }}</h1>
+      <div class="bg-gradient-to-br from-primary-50 to-purple-50 rounded-2xl shadow-lg p-4 sm:p-6 border border-primary-100 relative">
+        <!-- Favorite Button -->
+        <button
+          @click="handleFavoriteClick"
+          class="absolute top-4 right-4 p-3 rounded-full hover:bg-white/50 transition-colors z-10"
+          :class="isFavorited ? 'text-red-500' : 'text-gray-400'"
+          :title="isFavorited ? 'Remove from favorites' : 'Add to favorites'"
+        >
+          <svg class="w-7 h-7" :fill="isFavorited ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </button>
+
+        <h1 class="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent mb-3 pr-14">{{ bhajan.title }}</h1>
         
         <!-- Titles in other scripts -->
         <div class="mb-3 space-y-2">
@@ -157,6 +169,7 @@ import { useBhajanStore } from '@/stores/bhajanStore'
 import { useAuthStore } from '@/stores/authStore'
 import { usePreferencesStore } from '@/stores/preferencesStore'
 import { analyticsService } from '@/services/analyticsService'
+import { favoritesService } from '@/services/favoritesService'
 import ReportForm from '@/components/ReportForm.vue'
 
 const route = useRoute()
@@ -166,6 +179,7 @@ const authStore = useAuthStore()
 const preferencesStore = usePreferencesStore()
 
 const showReportForm = ref(false)
+const isFavorited = ref(false)
 
 const loading = computed(() => bhajanStore.loading)
 const error = computed(() => bhajanStore.error)
@@ -239,12 +253,40 @@ function handleReportSuccess() {
   alert('Report submitted successfully!')
 }
 
+async function handleFavoriteClick() {
+  if (!authStore.isAuthenticated) {
+    if (confirm('You need to be logged in to add favorites. Would you like to log in now?')) {
+      router.push('/login')
+    }
+    return
+  }
+
+  if (!bhajan.value) return
+
+  const result = await favoritesService.toggleFavorite(bhajan.value.id)
+  if (result.success) {
+    isFavorited.value = result.isFavorited
+  } else {
+    alert('Failed to update favorites: ' + result.error)
+  }
+}
+
+async function checkFavoriteStatus() {
+  if (authStore.isAuthenticated && bhajan.value) {
+    const { data } = await favoritesService.isFavorited(bhajan.value.id)
+    isFavorited.value = data || false
+  } else {
+    isFavorited.value = false
+  }
+}
+
 onMounted(async () => {
   await bhajanStore.fetchBhajanById(route.params.id)
   
   // Track view after successfully loading bhajan
   if (bhajanStore.currentBhajan) {
     await analyticsService.trackBhajanView(route.params.id)
+    await checkFavoriteStatus()
   }
 })
 </script>

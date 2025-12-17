@@ -16,6 +16,7 @@ const AdminDashboard = () => import('@/pages/AdminDashboard.vue')
 const ReviewQueue = () => import('@/pages/ReviewQueue.vue')
 const ReportsPage = () => import('@/pages/ReportsPage.vue')
 const MyBhajans = () => import('@/pages/MyBhajans.vue')
+const MyFavorites = () => import('@/pages/MyFavorites.vue')
 
 const routes = [
   {
@@ -82,6 +83,12 @@ const routes = [
     path: '/my-bhajans',
     name: 'MyBhajans',
     component: MyBhajans,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/my-favorites',
+    name: 'MyFavorites',
+    component: MyFavorites,
     meta: { requiresAuth: true }
   },
   {
