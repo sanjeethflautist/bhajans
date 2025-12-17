@@ -2,54 +2,106 @@
 -- Update User Roles System
 -- =============================================
 
--- Create new role type
+-- Step 1: Handle role column migration
 DO $$ 
+DECLARE
+  role_column_exists boolean;
+  role_new_column_exists boolean;
+  current_role_type text;
 BEGIN
+  -- Check if role column exists
+  SELECT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_schema = 'public'
+    AND table_name = 'user_profiles' 
+    AND column_name = 'role'
+  ) INTO role_column_exists;
+
+  -- Check if role_new column exists
+  SELECT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_schema = 'public'
+    AND table_name = 'user_profiles' 
+    AND column_name = 'role_new'
+  ) INTO role_new_column_exists;
+
+  -- Get current type of role column if it exists
+  IF role_column_exists THEN
+    SELECT udt_name INTO current_role_type
+    FROM information_schema.columns 
+    WHERE table_schema = 'public'
+    AND table_name = 'user_profiles' 
+    AND column_name = 'role';
+  END IF;
+
+  -- If role already uses user_role with contributor, skip migration
+  IF role_column_exists AND current_role_type = 'user_role' AND EXISTS (
+    SELECT 1 FROM pg_enum e
+    JOIN pg_type t ON e.enumtypid = t.oid
+    WHERE t.typname = 'user_role' AND e.enumlabel = 'contributor'
+  ) THEN
+    RAISE NOTICE 'Role column already migrated to new type';
+    RETURN;
+  END IF;
+
+  -- Create new role type if it doesn't exist
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role_new') THEN
     CREATE TYPE user_role_new AS ENUM ('contributor', 'reviewer', 'admin');
+    RAISE NOTICE 'Created user_role_new type';
   END IF;
+
+  -- Add temporary column if it doesn't exist
+  IF NOT role_new_column_exists THEN
+    ALTER TABLE public.user_profiles ADD COLUMN role_new user_role_new;
+    RAISE NOTICE 'Added role_new column';
+  END IF;
+
+  -- Migrate data if role column exists and role_new is null
+  IF role_column_exists THEN
+    UPDATE public.user_profiles 
+    SET role_new = CASE 
+      WHEN role::text = 'admin' THEN 'admin'::user_role_new
+      WHEN role::text = 'editor' THEN 'contributor'::user_role_new
+      WHEN role::text = 'user' THEN 'contributor'::user_role_new
+      ELSE 'contributor'::user_role_new
+    END
+    WHERE role_new IS NULL;
+    RAISE NOTICE 'Migrated role data';
+
+    -- Drop old role column with CASCADE
+    ALTER TABLE public.user_profiles DROP COLUMN role CASCADE;
+    RAISE NOTICE 'Dropped old role column with CASCADE';
+  END IF;
+
+  -- Rename role_new to role
+  IF role_new_column_exists OR NOT role_column_exists THEN
+    ALTER TABLE public.user_profiles RENAME COLUMN role_new TO role;
+    RAISE NOTICE 'Renamed role_new to role';
+  END IF;
+
+  -- Set constraints
+  ALTER TABLE public.user_profiles ALTER COLUMN role SET NOT NULL;
+  ALTER TABLE public.user_profiles ALTER COLUMN role SET DEFAULT 'contributor'::user_role_new;
+  RAISE NOTICE 'Set NOT NULL and DEFAULT constraints';
+
+  -- Drop old type and rename new type
+  DROP TYPE IF EXISTS user_role CASCADE;
+  ALTER TYPE user_role_new RENAME TO user_role;
+  RAISE NOTICE 'Renamed user_role_new to user_role';
+
+  -- Update default to use renamed type
+  ALTER TABLE public.user_profiles ALTER COLUMN role SET DEFAULT 'contributor'::user_role;
+
+  -- Add comments
+  COMMENT ON TYPE user_role IS 'contributor: Can create and edit own bhajans, reviewer: Can approve/reject bhajans, admin: Full access';
+  COMMENT ON COLUMN public.user_profiles.role IS 'User role: contributor (default), reviewer, or admin';
+  RAISE NOTICE 'Migration completed successfully';
+
+EXCEPTION
+  WHEN OTHERS THEN
+    RAISE NOTICE 'Error during migration: %', SQLERRM;
+    RAISE;
 END $$;
-
--- Add a temporary column with the new type
-ALTER TABLE public.user_profiles 
-  ADD COLUMN IF NOT EXISTS role_new user_role_new;
-
--- Migrate existing data to new roles
-UPDATE public.user_profiles 
-SET role_new = CASE 
-  WHEN role::text = 'admin' THEN 'admin'::user_role_new
-  WHEN role::text = 'editor' THEN 'contributor'::user_role_new
-  WHEN role::text = 'user' THEN 'contributor'::user_role_new
-  ELSE 'contributor'::user_role_new
-END;
-
--- Drop the old column (CASCADE will drop dependent policies)
-ALTER TABLE public.user_profiles DROP COLUMN role CASCADE;
-
--- Rename the new column to the original name
-ALTER TABLE public.user_profiles RENAME COLUMN role_new TO role;
-
--- Set NOT NULL constraint
-ALTER TABLE public.user_profiles 
-  ALTER COLUMN role SET NOT NULL;
-
--- Set default for new users
-ALTER TABLE public.user_profiles 
-  ALTER COLUMN role SET DEFAULT 'contributor'::user_role_new;
-
--- Drop old type
-DROP TYPE IF EXISTS user_role CASCADE;
-
--- Rename new type to old name
-ALTER TYPE user_role_new RENAME TO user_role;
-
--- Update the default to use the renamed type
-ALTER TABLE public.user_profiles 
-  ALTER COLUMN role SET DEFAULT 'contributor'::user_role;
-
--- Add comments
-COMMENT ON TYPE user_role IS 'contributor: Can create and edit own bhajans, reviewer: Can approve/reject bhajans, admin: Full access';
-COMMENT ON COLUMN public.user_profiles.role IS 'User role: contributor (default), reviewer, or admin';
 
 -- Recreate RLS policies with new roles
 
@@ -95,6 +147,7 @@ CREATE POLICY "Users can update own bhajans, reviewers and admins can update any
     )
   )
   WITH CHECK (
+    -- Allow if user is the creator OR if user is reviewer/admin
     auth.uid() = created_by OR 
     EXISTS (
       SELECT 1 FROM public.user_profiles
