@@ -88,6 +88,13 @@ CREATE POLICY "Users can update own bhajans, reviewers and admins can update any
       SELECT 1 FROM public.user_profiles
       WHERE id = auth.uid() AND role IN ('reviewer', 'admin')
     )
+  )
+  WITH CHECK (
+    auth.uid() = created_by OR 
+    EXISTS (
+      SELECT 1 FROM public.user_profiles
+      WHERE id = auth.uid() AND role IN ('reviewer', 'admin')
+    )
   );
 
 -- Only admins can delete bhajans
