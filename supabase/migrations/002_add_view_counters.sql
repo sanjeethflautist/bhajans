@@ -58,6 +58,7 @@ SELECT
 ALTER TABLE public.site_stats ENABLE ROW LEVEL SECURITY;
 
 -- Everyone can read site stats
+DROP POLICY IF EXISTS "Anyone can read site stats" ON public.site_stats;
 CREATE POLICY "Anyone can read site stats"
   ON public.site_stats
   FOR SELECT
