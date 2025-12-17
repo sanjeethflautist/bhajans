@@ -71,7 +71,10 @@
         </div>
 
         <!-- Total Users -->
-        <div class="card bg-blue-50 border border-blue-200">
+        <div 
+          @click="scrollToUserManagement"
+          class="card bg-blue-50 border border-blue-200 cursor-pointer hover:shadow-lg transition-shadow"
+        >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-medium text-blue-700 mb-1">Total Users</p>
@@ -446,7 +449,7 @@
       </div>
 
       <!-- User Management Section -->
-      <div class="card mt-6">
+      <div ref="userManagementSection" class="card mt-6">
         <h3 class="text-xl font-bold text-gray-900 mb-4">User Management</h3>
         
         <div v-if="loadingUsers" class="text-center py-8 text-gray-500">
@@ -577,6 +580,7 @@ import { supabase } from '@/services/supabaseClient'
 const router = useRouter()
 const authStore = useAuthStore()
 
+const userManagementSection = ref(null)
 const loading = ref(true)
 const loadingActivity = ref(true)
 const loadingUsers = ref(true)
@@ -656,6 +660,12 @@ function goToApprovedBhajans() {
 
 function goToReports() {
   router.push('/admin/reports')
+}
+
+function scrollToUserManagement() {
+  if (userManagementSection.value) {
+    userManagementSection.value.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 }
 
 async function updateUserRole(userId, newRole) {
