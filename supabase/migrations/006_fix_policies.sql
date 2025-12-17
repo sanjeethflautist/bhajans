@@ -29,6 +29,19 @@ CREATE POLICY "Anyone can view approved bhajans"
   TO public
   USING (status = 'approved');
 
+CREATE POLICY "Authenticated users can view all bhajans"
+  ON public.bhajans
+  FOR SELECT
+  TO authenticated
+  USING (
+    status = 'approved' OR
+    auth.uid() = created_by OR
+    EXISTS (
+      SELECT 1 FROM public.user_profiles
+      WHERE id = auth.uid() AND role IN ('reviewer', 'admin')
+    )
+  );
+
 CREATE POLICY "Contributors can create bhajans"
   ON public.bhajans
   FOR INSERT
@@ -37,21 +50,24 @@ CREATE POLICY "Contributors can create bhajans"
     auth.uid() = created_by
   );
 
-CREATE POLICY "Users can update own bhajans, reviewers and admins can update any"
+CREATE POLICY "Users can update own bhajans"
+  ON public.bhajans
+  FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = created_by)
+  WITH CHECK (auth.uid() = created_by);
+
+CREATE POLICY "Reviewers and admins can update any bhajan"
   ON public.bhajans
   FOR UPDATE
   TO authenticated
   USING (
-    auth.uid() = created_by OR 
     EXISTS (
       SELECT 1 FROM public.user_profiles
       WHERE id = auth.uid() AND role IN ('reviewer', 'admin')
     )
   )
   WITH CHECK (
-    -- Contributors can update their own bhajans
-    -- Reviewers and admins can update any bhajan
-    auth.uid() = created_by OR 
     EXISTS (
       SELECT 1 FROM public.user_profiles
       WHERE id = auth.uid() AND role IN ('reviewer', 'admin')
