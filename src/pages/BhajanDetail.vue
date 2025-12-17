@@ -99,7 +99,6 @@
 
       <!-- Lyrics -->
       <div class="card space-y-6">
-        <h3 class="text-xl font-bold text-gray-900 mb-4">Lyrics</h3>
         
         <!-- Display lyrics in enabled scripts -->
         <div 
@@ -108,7 +107,6 @@
           v-show="preferencesStore.isScriptEnabled(script.id) && bhajan[script.field]"
           class="bg-gray-50 p-6 rounded-lg"
         >
-          <h4 class="text-sm font-semibold text-gray-600 mb-3">{{ script.label }}</h4>
           <pre 
             class="whitespace-pre-wrap font-serif text-gray-800 leading-relaxed text-lg"
             :lang="script.id === 'kannada' ? 'kn' : script.id === 'devanagari' ? 'hi' : 'en'"
@@ -129,7 +127,6 @@
         v-if="preferencesStore.showMeaning && bhajan.meaning" 
         class="card bg-blue-50 border-l-4 border-blue-400"
       >
-        <h3 class="text-xl font-bold text-blue-900 mb-4">Meaning</h3>
         <div class="prose prose-blue max-w-none">
           <pre class="whitespace-pre-wrap font-sans text-gray-800 leading-relaxed">{{ bhajan.meaning }}</pre>
         </div>
