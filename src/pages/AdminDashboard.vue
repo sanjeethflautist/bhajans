@@ -445,38 +445,6 @@
         </div>
       </div>
 
-      <!-- Recent Activity -->
-      <div class="card">
-        <h3 class="text-xl font-bold text-gray-900 mb-4">Recent Activity</h3>
-        
-        <div v-if="loadingActivity" class="text-center py-8 text-gray-500">
-          Loading activity...
-        </div>
-
-        <div v-else-if="recentActivity.length === 0" class="text-center py-8 text-gray-500">
-          No recent activity
-        </div>
-
-        <div v-else class="space-y-3">
-          <div
-            v-for="activity in recentActivity"
-            :key="activity.id"
-            class="flex items-start gap-4 p-3 bg-gray-50 rounded-lg"
-          >
-            <div class="flex-1">
-              <p class="text-sm font-medium text-gray-900">
-                {{ activity.user?.email || 'Unknown' }}
-                <span class="text-gray-600">{{ formatAction(activity.action) }}</span>
-                <span class="font-medium">{{ activity.entity_type }}</span>
-              </p>
-              <p class="text-xs text-gray-500 mt-1">
-                {{ formatDate(activity.created_at) }}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- User Management Section -->
       <div class="card mt-6">
         <h3 class="text-xl font-bold text-gray-900 mb-4">User Management</h3>
@@ -535,6 +503,66 @@
           </table>
         </div>
       </div>
+
+      <!-- Recent Activity (at bottom) -->
+      <div class="card mt-6">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">📋 Recent Activity</h3>
+        
+        <div v-if="loadingActivity" class="text-center py-8 text-gray-500">
+          Loading activity...
+        </div>
+
+        <div v-else-if="recentActivity.length === 0" class="text-center py-8 text-gray-500">
+          No recent activity
+        </div>
+
+        <div v-else class="space-y-2">
+          <div
+            v-for="activity in recentActivity"
+            :key="activity.id"
+            class="border border-gray-200 rounded-lg overflow-hidden"
+          >
+            <div 
+              @click="toggleActivityDetails(activity.id)"
+              class="flex items-start justify-between gap-4 p-3 bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors"
+            >
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-900">
+                  <span class="text-primary-600">{{ activity.user?.email || 'Unknown' }}</span>
+                  <span class="text-gray-600 mx-1">{{ formatAction(activity.action) }}</span>
+                  <span class="font-medium text-gray-900">{{ activity.entity_type }}</span>
+                  <span v-if="activity.entity_id" class="text-gray-500 text-xs">#{{ activity.entity_id.slice(0, 8) }}</span>
+                </p>
+                <p class="text-xs text-gray-500 mt-1">
+                  {{ formatDate(activity.created_at) }}
+                </p>
+              </div>
+              <button class="text-gray-400 hover:text-gray-600">
+                <svg 
+                  class="w-5 h-5 transition-transform" 
+                  :class="expandedActivities.has(activity.id) ? 'rotate-180' : ''"
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </div>
+            
+            <!-- Expanded Details -->
+            <div v-if="expandedActivities.has(activity.id)" class="p-4 bg-white border-t border-gray-200">
+              <div v-if="activity.changes" class="space-y-2">
+                <h4 class="text-xs font-semibold text-gray-700 uppercase mb-2">Changes:</h4>
+                <pre class="text-xs bg-gray-900 text-green-400 p-3 rounded overflow-x-auto font-mono">{{ JSON.stringify(activity.changes, null, 2) }}</pre>
+              </div>
+              <div v-else class="text-sm text-gray-500 italic">
+                No change details available
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -569,6 +597,17 @@ const showArchivedBhajans = ref(false)
 const applicationTab = ref('pending')
 const feedbackTab = ref('active')
 const featureTab = ref('active')
+const expandedActivities = ref(new Set())
+
+function toggleActivityDetails(activityId) {
+  if (expandedActivities.value.has(activityId)) {
+    expandedActivities.value.delete(activityId)
+  } else {
+    expandedActivities.value.add(activityId)
+  }
+  // Trigger reactivity
+  expandedActivities.value = new Set(expandedActivities.value)
+}
 
 // Computed filtered lists
 const archivedBhajansCount = computed(() => archivedBhajans.value.length)
