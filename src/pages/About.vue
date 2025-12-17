@@ -349,6 +349,7 @@ async function submitApplication() {
       .from('reviewer_applications')
       .insert([{
         user_id: authStore.user.id,
+        email: authStore.user.email,
         motivation: application.value.motivation,
         experience: application.value.experience,
         languages: languages.join(', '),
@@ -358,6 +359,7 @@ async function submitApplication() {
       }])
 
     if (error) {
+      console.error('Application submission error:', error)
       // If table doesn't exist, show a friendly message
       if (error.code === '42P01') {
         submitSuccess.value = true

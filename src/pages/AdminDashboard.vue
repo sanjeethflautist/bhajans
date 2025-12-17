@@ -16,7 +16,7 @@
     <!-- Dashboard Content -->
     <div v-else>
       <!-- Stats Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
         <!-- Approved Bhajans -->
         <div 
           @click="goToApprovedBhajans"
@@ -45,6 +45,20 @@
           </div>
         </div>
 
+        <!-- Archived Bhajans -->
+        <div 
+          @click="showArchivedBhajans = !showArchivedBhajans"
+          class="card bg-gray-50 border border-gray-200 cursor-pointer hover:shadow-lg transition-shadow"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-700 mb-1">Archived</p>
+              <p class="text-3xl font-bold text-gray-900">{{ archivedBhajansCount }}</p>
+            </div>
+            <div class="text-4xl">📦</div>
+          </div>
+        </div>
+
         <!-- Open Reports -->
         <div class="card bg-red-50 border border-red-200">
           <div class="flex items-center justify-between">
@@ -64,6 +78,57 @@
               <p class="text-3xl font-bold text-blue-900">{{ stats.total_users || 0 }}</p>
             </div>
             <div class="text-4xl">👥</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Archived Bhajans Section (Collapsible) -->
+      <div v-if="showArchivedBhajans" class="card mb-8">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-bold text-gray-900">Archived Bhajans</h3>
+          <button @click="showArchivedBhajans = false" class="text-gray-500 hover:text-gray-700">
+            ✕ Close
+          </button>
+        </div>
+        
+        <div v-if="loadingArchivedBhajans" class="text-center py-8 text-gray-500">
+          Loading archived bhajans...
+        </div>
+
+        <div v-else-if="archivedBhajans.length === 0" class="text-center py-8 text-gray-500">
+          No archived bhajans
+        </div>
+
+        <div v-else class="space-y-3">
+          <div
+            v-for="bhajan in archivedBhajans"
+            :key="bhajan.id"
+            class="p-4 bg-gray-50 rounded-lg border border-gray-200"
+          >
+            <div class="flex items-start justify-between mb-2">
+              <div>
+                <p class="text-sm font-bold text-gray-900">{{ bhajan.title }}</p>
+                <p class="text-xs text-gray-500">Archived {{ formatDate(bhajan.updated_at) }}</p>
+              </div>
+              <span class="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700">
+                {{ bhajan.status }}
+              </span>
+            </div>
+            <p class="text-sm text-gray-700 mb-3 line-clamp-2">{{ bhajan.lyrics }}</p>
+            <div class="flex gap-2">
+              <button
+                @click="restoreBhajan(bhajan.id)"
+                class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200"
+              >
+                Restore to Draft
+              </button>
+              <button
+                @click="permanentlyDeleteBhajan(bhajan.id)"
+                class="text-xs px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200"
+              >
+                Delete Permanently
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -90,6 +155,293 @@
           <button class="btn-primary">
             Manage Reports →
           </button>
+        </div>
+      </div>
+
+      <!-- Reviewer Applications Tabs -->
+      <div class="card mb-8">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-bold text-gray-900">Reviewer Applications</h3>
+          <div class="flex gap-2">
+            <button
+              @click="applicationTab = 'pending'"
+              :class="[
+                'px-3 py-1 text-sm rounded',
+                applicationTab === 'pending' 
+                  ? 'bg-yellow-100 text-yellow-700 font-medium' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              ]"
+            >
+              Pending ({{ pendingApplications.length }})
+            </button>
+            <button
+              @click="applicationTab = 'approved'"
+              :class="[
+                'px-3 py-1 text-sm rounded',
+                applicationTab === 'approved' 
+                  ? 'bg-green-100 text-green-700 font-medium' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              ]"
+            >
+              Approved ({{ approvedApplications.length }})
+            </button>
+            <button
+              @click="applicationTab = 'rejected'"
+              :class="[
+                'px-3 py-1 text-sm rounded',
+                applicationTab === 'rejected' 
+                  ? 'bg-red-100 text-red-700 font-medium' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              ]"
+            >
+              Rejected ({{ rejectedApplications.length }})
+            </button>
+          </div>
+        </div>
+        
+        <div v-if="loadingApplications" class="text-center py-8 text-gray-500">
+          Loading applications...
+        </div>
+
+        <div v-else-if="currentApplications.length === 0" class="text-center py-8 text-gray-500">
+          No {{ applicationTab }} applications
+        </div>
+
+        <div v-else class="space-y-4">
+          <div
+            v-for="app in currentApplications"
+            :key="app.id"
+            class="p-4 bg-gray-50 rounded-lg border border-gray-200"
+          >
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <p class="text-sm font-bold text-gray-900">{{ app.email }}</p>
+                <p class="text-xs text-gray-500">Applied {{ formatDate(app.created_at) }}</p>
+              </div>
+              <span :class="[
+                'px-2 py-1 rounded text-xs font-medium',
+                app.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                app.status === 'approved' ? 'bg-green-100 text-green-700' :
+                'bg-red-100 text-red-700'
+              ]">
+                {{ app.status }}
+              </span>
+            </div>
+            
+            <div class="space-y-2 mb-3">
+              <div>
+                <p class="text-xs font-medium text-gray-700">Languages:</p>
+                <p class="text-sm text-gray-900">{{ app.languages }}</p>
+              </div>
+              <div>
+                <p class="text-xs font-medium text-gray-700">Motivation:</p>
+                <p class="text-sm text-gray-900">{{ app.motivation }}</p>
+              </div>
+              <div>
+                <p class="text-xs font-medium text-gray-700">Experience:</p>
+                <p class="text-sm text-gray-900">{{ app.experience }}</p>
+              </div>
+              <div v-if="app.comments">
+                <p class="text-xs font-medium text-gray-700">Comments:</p>
+                <p class="text-sm text-gray-900">{{ app.comments }}</p>
+              </div>
+            </div>
+
+            <div v-if="app.status === 'pending'" class="flex gap-2">
+              <button
+                @click="handleReviewerApplication(app.id, app.user_id, 'approved')"
+                class="text-sm px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+              >
+                Approve
+              </button>
+              <button
+                @click="handleReviewerApplication(app.id, app.user_id, 'rejected')"
+                class="text-sm px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Reject
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feedback & Feature Requests Tabs -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Feedback -->
+        <div class="card">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold text-gray-900">Feedback</h3>
+            <div class="flex gap-2">
+              <button
+                @click="feedbackTab = 'active'"
+                :class="[
+                  'px-2 py-1 text-xs rounded',
+                  feedbackTab === 'active' 
+                    ? 'bg-blue-100 text-blue-700 font-medium' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ]"
+              >
+                Active ({{ activeFeedback.length }})
+              </button>
+              <button
+                @click="feedbackTab = 'archived'"
+                :class="[
+                  'px-2 py-1 text-xs rounded',
+                  feedbackTab === 'archived' 
+                    ? 'bg-gray-200 text-gray-700 font-medium' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ]"
+              >
+                Archived ({{ archivedFeedback.length }})
+              </button>
+            </div>
+          </div>
+          
+          <div v-if="loadingFeedback" class="text-center py-8 text-gray-500">
+            Loading feedback...
+          </div>
+
+          <div v-else-if="currentFeedback.length === 0" class="text-center py-8 text-gray-500">
+            No {{ feedbackTab }} feedback
+          </div>
+
+          <div v-else class="space-y-3 max-h-96 overflow-y-auto">
+            <div
+              v-for="item in currentFeedback"
+              :key="item.id"
+              class="p-3 bg-gray-50 rounded-lg border border-gray-200"
+            >
+              <div class="flex items-start justify-between mb-2">
+                <div>
+                  <p class="text-sm font-medium text-gray-900">{{ item.name || 'Anonymous' }}</p>
+                  <p class="text-xs text-gray-500">{{ formatDate(item.created_at) }}</p>
+                </div>
+                <span :class="[
+                  'px-2 py-1 rounded text-xs font-medium',
+                  item.type === 'bug' ? 'bg-red-100 text-red-700' :
+                  item.type === 'improvement' ? 'bg-blue-100 text-blue-700' :
+                  item.type === 'compliment' ? 'bg-green-100 text-green-700' :
+                  'bg-gray-100 text-gray-700'
+                ]">
+                  {{ item.type }}
+                </span>
+              </div>
+              <p class="text-sm text-gray-700">{{ item.message }}</p>
+              <div class="mt-2 flex gap-2">
+                <button
+                  v-if="item.status === 'new'"
+                  @click="updateFeedbackStatus(item.id, 'reviewed')"
+                  class="text-xs px-2 py-1 bg-primary-100 text-primary-700 rounded hover:bg-primary-200"
+                >
+                  Mark Reviewed
+                </button>
+                <button
+                  v-if="item.status !== 'archived'"
+                  @click="updateFeedbackStatus(item.id, 'archived')"
+                  class="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                >
+                  Archive
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature Requests -->
+        <div class="card">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold text-gray-900">Feature Requests</h3>
+            <div class="flex gap-2">
+              <button
+                @click="featureTab = 'active'"
+                :class="[
+                  'px-2 py-1 text-xs rounded',
+                  featureTab === 'active' 
+                    ? 'bg-purple-100 text-purple-700 font-medium' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ]"
+              >
+                Active ({{ activeFeatures.length }})
+              </button>
+              <button
+                @click="featureTab = 'archived'"
+                :class="[
+                  'px-2 py-1 text-xs rounded',
+                  featureTab === 'archived' 
+                    ? 'bg-gray-200 text-gray-700 font-medium' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ]"
+              >
+                Archived ({{ archivedFeatures.length }})
+              </button>
+            </div>
+          </div>
+          
+          <div v-if="loadingFeatures" class="text-center py-8 text-gray-500">
+            Loading feature requests...
+          </div>
+
+          <div v-else-if="currentFeatures.length === 0" class="text-center py-8 text-gray-500">
+            No {{ featureTab }} feature requests
+          </div>
+
+          <div v-else class="space-y-3 max-h-96 overflow-y-auto">
+            <div
+              v-for="item in currentFeatures"
+              :key="item.id"
+              class="p-3 bg-purple-50 rounded-lg border border-purple-200"
+            >
+              <div class="flex items-start justify-between mb-2">
+                <div>
+                  <p class="text-sm font-bold text-gray-900">{{ item.title }}</p>
+                  <p class="text-xs text-gray-500">by {{ item.name || 'Anonymous' }} • {{ formatDate(item.created_at) }}</p>
+                </div>
+                <span :class="[
+                  'px-2 py-1 rounded text-xs font-medium',
+                  item.category === 'ui' ? 'bg-blue-100 text-blue-700' :
+                  item.category === 'functionality' ? 'bg-green-100 text-green-700' :
+                  item.category === 'performance' ? 'bg-yellow-100 text-yellow-700' :
+                  'bg-gray-100 text-gray-700'
+                ]">
+                  {{ item.category }}
+                </span>
+              </div>
+              <p class="text-sm text-gray-700 mb-2">{{ item.description }}</p>
+              <div class="flex items-center gap-2 text-xs text-gray-600 mb-2">
+                <span>👍 {{ item.votes || 0 }} votes</span>
+              </div>
+              <div class="flex gap-2">
+                <button
+                  v-if="item.status === 'new'"
+                  @click="updateFeatureStatus(item.id, 'under_review')"
+                  class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                >
+                  Review
+                </button>
+                <button
+                  v-if="item.status !== 'planned'"
+                  @click="updateFeatureStatus(item.id, 'planned')"
+                  class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200"
+                >
+                  Plan
+                </button>
+                <button
+                  v-if="item.status !== 'rejected'"
+                  @click="updateFeatureStatus(item.id, 'rejected')"
+                  class="text-xs px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200"
+                >
+                  Reject
+                </button>
+                <button
+                  v-if="item.status !== 'archived'"
+                  @click="updateFeatureStatus(item.id, 'archived')"
+                  class="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                >
+                  Archive
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -188,10 +540,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { adminService } from '@/services/adminService'
 import { useAuthStore } from '@/stores/authStore'
+import { supabase } from '@/services/supabaseClient'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -199,9 +552,60 @@ const authStore = useAuthStore()
 const loading = ref(true)
 const loadingActivity = ref(true)
 const loadingUsers = ref(true)
+const loadingFeedback = ref(true)
+const loadingFeatures = ref(true)
+const loadingApplications = ref(true)
+const loadingArchivedBhajans = ref(false)
 const stats = ref({})
 const recentActivity = ref([])
 const users = ref([])
+const feedback = ref([])
+const featureRequests = ref([])
+const reviewerApplications = ref([])
+const archivedBhajans = ref([])
+const showArchivedBhajans = ref(false)
+
+// Tab states
+const applicationTab = ref('pending')
+const feedbackTab = ref('active')
+const featureTab = ref('active')
+
+// Computed filtered lists
+const archivedBhajansCount = computed(() => archivedBhajans.value.length)
+const pendingApplications = computed(() => 
+  reviewerApplications.value.filter(app => app.status === 'pending')
+)
+const approvedApplications = computed(() => 
+  reviewerApplications.value.filter(app => app.status === 'approved')
+)
+const rejectedApplications = computed(() => 
+  reviewerApplications.value.filter(app => app.status === 'rejected')
+)
+const currentApplications = computed(() => {
+  if (applicationTab.value === 'pending') return pendingApplications.value
+  if (applicationTab.value === 'approved') return approvedApplications.value
+  return rejectedApplications.value
+})
+
+const activeFeedback = computed(() => 
+  feedback.value.filter(item => item.status !== 'archived')
+)
+const archivedFeedback = computed(() => 
+  feedback.value.filter(item => item.status === 'archived')
+)
+const currentFeedback = computed(() => 
+  feedbackTab.value === 'active' ? activeFeedback.value : archivedFeedback.value
+)
+
+const activeFeatures = computed(() => 
+  featureRequests.value.filter(item => item.status !== 'archived')
+)
+const archivedFeatures = computed(() => 
+  featureRequests.value.filter(item => item.status === 'archived')
+)
+const currentFeatures = computed(() => 
+  featureTab.value === 'active' ? activeFeatures.value : archivedFeatures.value
+)
 
 function goToReviewQueue() {
   router.push('/admin/review-queue')
@@ -278,7 +682,6 @@ async function fetchActivity() {
   }
   loadingActivity.value = false
 }
-
 async function fetchUsers() {
   loadingUsers.value = true
   const { data, error } = await adminService.getAllUsers({ limit: 50 })
@@ -288,11 +691,207 @@ async function fetchUsers() {
   loadingUsers.value = false
 }
 
+async function fetchFeedback() {
+  loadingFeedback.value = true
+  try {
+    const { data, error } = await supabase
+      .from('feedback')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(20)
+    
+    if (!error && data) {
+      feedback.value = data
+    }
+  } catch (err) {
+    console.error('Error fetching feedback:', err)
+  }
+  loadingFeedback.value = false
+}
+
+async function fetchFeatureRequests() {
+  loadingFeatures.value = true
+  try {
+    const { data, error } = await supabase
+      .from('feature_requests')
+      .select('*')
+      .order('votes', { ascending: false })
+      .limit(20)
+    
+    if (!error && data) {
+      featureRequests.value = data
+    }
+  } catch (err) {
+    console.error('Error fetching feature requests:', err)
+  }
+  loadingFeatures.value = false
+}
+
+async function updateFeedbackStatus(id, status) {
+  try {
+    const { error } = await supabase
+      .from('feedback')
+      .update({ status, updated_at: new Date().toISOString() })
+      .eq('id', id)
+    
+    if (!error) {
+      await fetchFeedback()
+    }
+  } catch (err) {
+    console.error('Error updating feedback:', err)
+    alert('Failed to update feedback status')
+  }
+}
+
+async function updateFeatureStatus(id, status) {
+  try {
+    const { error } = await supabase
+      .from('feature_requests')
+      .update({ status, updated_at: new Date().toISOString() })
+      .eq('id', id)
+    
+    if (!error) {
+      await fetchFeatureRequests()
+    }
+  } catch (err) {
+    console.error('Error updating feature request:', err)
+    alert('Failed to update feature request status')
+  }
+}
+
+async function fetchReviewerApplications() {
+  loadingApplications.value = true
+  try {
+    const { data, error } = await supabase
+      .from('reviewer_applications')
+      .select('*')
+      .order('created_at', { ascending: false })
+    
+    if (!error && data) {
+      reviewerApplications.value = data
+    }
+  } catch (err) {
+    console.error('Error fetching reviewer applications:', err)
+  }
+  loadingApplications.value = false
+}
+
+async function handleReviewerApplication(applicationId, userId, status) {
+  const action = status === 'approved' ? 'approve' : 'reject'
+  if (!confirm(`Are you sure you want to ${action} this application?`)) {
+    return
+  }
+
+  try {
+    // Update application status
+    const { error: appError } = await supabase
+      .from('reviewer_applications')
+      .update({ 
+        status,
+        reviewed_by: authStore.user.id,
+        reviewed_at: new Date().toISOString()
+      })
+      .eq('id', applicationId)
+    
+    if (appError) throw appError
+
+    // If approved, update user role to reviewer
+    if (status === 'approved' && userId) {
+      const result = await authStore.updateUserRole(userId, 'reviewer')
+      if (!result.success) {
+        alert('Application approved but failed to update user role. Please update manually.')
+      }
+    }
+
+    await fetchReviewerApplications()
+    alert(`Application ${status} successfully`)
+  } catch (err) {
+    console.error('Error handling application:', err)
+    alert('Failed to update application')
+  }
+}
+
+async function fetchArchivedBhajans() {
+  loadingArchivedBhajans.value = true
+  try {
+    const { data, error } = await supabase
+      .from('bhajans')
+      .select('*')
+      .in('status', ['archived', 'rejected'])
+      .order('updated_at', { ascending: false })
+    
+    if (!error && data) {
+      archivedBhajans.value = data
+    }
+  } catch (err) {
+    console.error('Error fetching archived bhajans:', err)
+  }
+  loadingArchivedBhajans.value = false
+}
+
+async function restoreBhajan(bhajanId) {
+  if (!confirm('Restore this bhajan to draft status?')) {
+    return
+  }
+
+  try {
+    const { error } = await supabase
+      .from('bhajans')
+      .update({ status: 'draft', updated_at: new Date().toISOString() })
+      .eq('id', bhajanId)
+    
+    if (!error) {
+      await fetchArchivedBhajans()
+      await fetchStats()
+      alert('Bhajan restored to draft')
+    } else {
+      throw error
+    }
+  } catch (err) {
+    console.error('Error restoring bhajan:', err)
+    alert('Failed to restore bhajan')
+  }
+}
+
+async function permanentlyDeleteBhajan(bhajanId) {
+  if (!confirm('PERMANENTLY delete this bhajan? This action cannot be undone!')) {
+    return
+  }
+
+  try {
+    const { error } = await supabase
+      .from('bhajans')
+      .delete()
+      .eq('id', bhajanId)
+    
+    if (!error) {
+      await fetchArchivedBhajans()
+      await fetchStats()
+      alert('Bhajan permanently deleted')
+    } else {
+      throw error
+    }
+  } catch (err) {
+    console.error('Error deleting bhajan:', err)
+    alert('Failed to delete bhajan')
+  }
+}
+
+// Watch for showArchivedBhajans and fetch when opened
+watch(showArchivedBhajans, (newValue) => {
+  if (newValue && archivedBhajans.value.length === 0) {
+    fetchArchivedBhajans()
+  }
+})
+
 onMounted(async () => {
   await Promise.all([
     fetchStats(),
     fetchActivity(),
-    fetchUsers()
+    fetchUsers(),
+    fetchFeedback(),
+    fetchFeatureRequests(),
+    fetchReviewerApplications()
   ])
   loading.value = false
 })

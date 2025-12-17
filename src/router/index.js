@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/authStore'
 // Lazy load pages for better performance
 const Home = () => import('@/pages/Home.vue')
 const About = () => import('@/pages/About.vue')
+const Feedback = () => import('@/pages/Feedback.vue')
 const Login = () => import('@/pages/Login.vue')
 const Signup = () => import('@/pages/Signup.vue')
 const ForgotPassword = () => import('@/pages/ForgotPassword.vue')
@@ -27,6 +28,12 @@ const routes = [
     path: '/about',
     name: 'About',
     component: About,
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/feedback',
+    name: 'Feedback',
+    component: Feedback,
     meta: { requiresAuth: false }
   },
   {
@@ -54,12 +61,6 @@ const routes = [
     meta: { requiresAuth: false }
   },
   {
-    path: '/bhajan/:id',
-    name: 'BhajanDetail',
-    component: BhajanDetail,
-    meta: { requiresAuth: false }
-  },
-  {
     path: '/bhajan/create',
     name: 'BhajanCreate',
     component: BhajanCreate,
@@ -70,6 +71,12 @@ const routes = [
     name: 'BhajanEdit',
     component: BhajanEdit,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/bhajan/:id',
+    name: 'BhajanDetail',
+    component: BhajanDetail,
+    meta: { requiresAuth: false }
   },
   {
     path: '/my-bhajans',

@@ -29,13 +29,6 @@
           </RouterLink>
 
           <RouterLink
-            to="/about"
-            class="text-gray-700 hover:text-primary-600 font-medium transition-all duration-200 hover:scale-105"
-          >
-            About
-          </RouterLink>
-
-          <RouterLink
             v-if="authStore.canCreateBhajan"
             to="/my-bhajans"
             class="text-gray-700 hover:text-primary-600 font-medium transition-all duration-200 hover:scale-105"
@@ -72,6 +65,67 @@
           >
             Admin
           </RouterLink>
+
+          <!-- Help & Feedback Button -->
+          <div class="relative">
+            <button
+              @click.stop="toggleHelpMenu"
+              class="p-2 rounded-xl hover:bg-white/50 transition-all duration-200 text-gray-700 hover:text-primary-600 transform hover:scale-110"
+              title="Help & Feedback"
+            >
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+              </svg>
+            </button>
+
+            <!-- Help Dropdown -->
+            <Transition
+              enter-active-class="transition ease-out duration-200"
+              enter-from-class="transform opacity-0 scale-95 -translate-y-2"
+              enter-to-class="transform opacity-100 scale-100 translate-y-0"
+              leave-active-class="transition ease-in duration-150"
+              leave-from-class="transform opacity-100 scale-100 translate-y-0"
+              leave-to-class="transform opacity-0 scale-95 -translate-y-2"
+            >
+              <div
+                v-if="showHelpMenu"
+                @click.stop
+                class="absolute right-0 mt-2 w-64 glass rounded-2xl shadow-2xl py-3 z-50 border border-white/20"
+              >
+                <div class="px-4 py-2 border-b border-gray-200/50">
+                  <h3 class="font-semibold text-gray-800 flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-primary-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                    </svg>
+                    Help & Feedback
+                  </h3>
+                </div>
+                
+                <div class="px-4 py-3">
+                  <RouterLink
+                    to="/about"
+                    @click="closeHelpMenu"
+                    class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-white/50 rounded-lg transition-colors"
+                  >
+                    <svg class="w-4 h-4 mr-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                    About
+                  </RouterLink>
+                  <RouterLink
+                    to="/feedback"
+                    @click="closeHelpMenu"
+                    class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-white/50 rounded-lg transition-colors mt-1"
+                  >
+                    <svg class="w-4 h-4 mr-3 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd" />
+                    </svg>
+                    Feedback & Feature Requests
+                  </RouterLink>
+                </div>
+              </div>
+            </Transition>
+          </div>
 
           <!-- Preferences Button -->
           <div class="relative">
@@ -231,14 +285,6 @@
             </RouterLink>
 
             <RouterLink
-              to="/about"
-              @click="closeMobileMenu"
-              class="px-4 py-2 text-gray-600 hover:bg-gray-100 hover:text-primary-600 rounded-lg transition"
-            >
-              About
-            </RouterLink>
-
-            <RouterLink
               v-if="authStore.canCreateBhajan"
               to="/my-bhajans"
               @click="closeMobileMenu"
@@ -280,9 +326,35 @@
               Admin
             </RouterLink>
 
-            <!-- Mobile Preferences Section -->
+            <!-- Mobile Help & Preferences Section -->
             <div class="px-4 py-3 border-t border-gray-200 mt-2">
-              <h3 class="font-semibold text-gray-800 mb-3">Display Preferences</h3>
+              <h3 class="font-semibold text-gray-800 mb-3">Help & Feedback</h3>
+              
+              <!-- Navigation Links -->
+              <div class="mb-4 space-y-2">
+                <RouterLink
+                  to="/about"
+                  @click="closeMobileMenu"
+                  class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition"
+                >
+                  <svg class="w-4 h-4 mr-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                  </svg>
+                  About
+                </RouterLink>
+                <RouterLink
+                  to="/feedback"
+                  @click="closeMobileMenu"
+                  class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition"
+                >
+                  <svg class="w-4 h-4 mr-3 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd" />
+                  </svg>
+                  Feedback & Feature Requests
+                </RouterLink>
+              </div>
+
+              <h3 class="font-semibold text-gray-800 mb-3 mt-4">Display Preferences</h3>
               
               <!-- Script Selection -->
               <div class="mb-4">
@@ -369,16 +441,25 @@ const preferencesStore = usePreferencesStore()
 const showUserMenu = ref(false)
 const showMobileMenu = ref(false)
 const showPreferencesMenu = ref(false)
+const showHelpMenu = ref(false)
 const pendingReviewCount = ref(0)
 
 function toggleUserMenu() {
   showUserMenu.value = !showUserMenu.value
+  showPreferencesMenu.value = false
+  showHelpMenu.value = false
+}
+
+function toggleHelpMenu() {
+  showHelpMenu.value = !showHelpMenu.value
+  showUserMenu.value = false
   showPreferencesMenu.value = false
 }
 
 function togglePreferencesMenu() {
   showPreferencesMenu.value = !showPreferencesMenu.value
   showUserMenu.value = false
+  showHelpMenu.value = false
 }
 
 function toggleMobileMenu() {
@@ -395,6 +476,10 @@ function closeUserMenu() {
 
 function closePreferencesMenu() {
   showPreferencesMenu.value = false
+}
+
+function closeHelpMenu() {
+  showHelpMenu.value = false
 }
 
 async function handleSignOut() {
@@ -415,6 +500,7 @@ function handleClickOutside(event) {
   if (!userMenu) {
     if (showUserMenu.value) closeUserMenu()
     if (showPreferencesMenu.value) closePreferencesMenu()
+    if (showHelpMenu.value) closeHelpMenu()
   }
 }
 
