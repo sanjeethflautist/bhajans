@@ -117,12 +117,15 @@ export const useBhajanStore = defineStore('bhajan', () => {
         updates
       )
       
+      // Refetch the complete bhajan data with relations
+      const { data: fullData } = await bhajanService.getBhajanById(id)
+      
       // Update current bhajan if it's the one being edited
       if (currentBhajan.value?.id === id) {
-        currentBhajan.value = data
+        currentBhajan.value = fullData
       }
       
-      return { success: true, data }
+      return { success: true, data: fullData || data }
     } catch (err) {
       error.value = err.message
       return { success: false, error: err.message }

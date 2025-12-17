@@ -70,8 +70,11 @@ export const bhajanService = {
       .update(updates)
       .eq('id', id)
       .select()
-      .single()
-    return { data, error }
+    
+    if (error) return { data: null, error }
+    
+    // Return the first item from the array
+    return { data: data?.[0] || null, error: null }
   },
 
   // Delete bhajan
