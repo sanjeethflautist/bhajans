@@ -57,8 +57,16 @@ COMMENT ON COLUMN public.user_profiles.role IS 'User role: contributor (default)
 -- Bhajans table policies
 -- =============================================
 
--- Anyone can view approved bhajans
+-- Drop all existing bhajan policies first
 DROP POLICY IF EXISTS "Anyone can view approved bhajans" ON public.bhajans;
+DROP POLICY IF EXISTS "Editors and admins can create bhajans" ON public.bhajans;
+DROP POLICY IF EXISTS "Contributors can create bhajans" ON public.bhajans;
+DROP POLICY IF EXISTS "Users can update own bhajans, admins can update any" ON public.bhajans;
+DROP POLICY IF EXISTS "Users can update own bhajans, editors and admins can update any" ON public.bhajans;
+DROP POLICY IF EXISTS "Users can update own bhajans, reviewers and admins can update any" ON public.bhajans;
+DROP POLICY IF EXISTS "Only admins can delete bhajans" ON public.bhajans;
+
+-- Anyone can view approved bhajans
 CREATE POLICY "Anyone can view approved bhajans"
   ON public.bhajans
   FOR SELECT
@@ -66,7 +74,6 @@ CREATE POLICY "Anyone can view approved bhajans"
   USING (status = 'approved');
 
 -- Contributors can create bhajans
-DROP POLICY IF EXISTS "Editors and admins can create bhajans" ON public.bhajans;
 CREATE POLICY "Contributors can create bhajans"
   ON public.bhajans
   FOR INSERT
@@ -76,8 +83,6 @@ CREATE POLICY "Contributors can create bhajans"
   );
 
 -- Users can update own bhajans, reviewers and admins can update any
-DROP POLICY IF EXISTS "Users can update own bhajans, admins can update any" ON public.bhajans;
-DROP POLICY IF EXISTS "Users can update own bhajans, editors and admins can update any" ON public.bhajans;
 CREATE POLICY "Users can update own bhajans, reviewers and admins can update any"
   ON public.bhajans
   FOR UPDATE
@@ -98,7 +103,6 @@ CREATE POLICY "Users can update own bhajans, reviewers and admins can update any
   );
 
 -- Only admins can delete bhajans
-DROP POLICY IF EXISTS "Only admins can delete bhajans" ON public.bhajans;
 CREATE POLICY "Only admins can delete bhajans"
   ON public.bhajans
   FOR DELETE
@@ -114,8 +118,12 @@ CREATE POLICY "Only admins can delete bhajans"
 -- Bhajan tags policies
 -- =============================================
 
--- Anyone can view tags for visible bhajans
+-- Drop all existing bhajan_tags policies first
 DROP POLICY IF EXISTS "Anyone can view tags for visible bhajans" ON public.bhajan_tags;
+DROP POLICY IF EXISTS "Editors and admins can manage tags" ON public.bhajan_tags;
+DROP POLICY IF EXISTS "Contributors can manage tags" ON public.bhajan_tags;
+
+-- Anyone can view tags for visible bhajans
 CREATE POLICY "Anyone can view tags for visible bhajans"
   ON public.bhajan_tags
   FOR SELECT
@@ -128,7 +136,6 @@ CREATE POLICY "Anyone can view tags for visible bhajans"
   );
 
 -- Contributors can manage tags on their own bhajans
-DROP POLICY IF EXISTS "Editors and admins can manage tags" ON public.bhajan_tags;
 CREATE POLICY "Contributors can manage tags"
   ON public.bhajan_tags
   FOR ALL
@@ -144,8 +151,12 @@ CREATE POLICY "Contributors can manage tags"
 -- Reports policies
 -- =============================================
 
--- Users can view own reports, admins can view all
+-- Drop all existing reports policies first
 DROP POLICY IF EXISTS "Users can view own reports, admins can view all" ON public.reports;
+DROP POLICY IF EXISTS "Only admins can update reports" ON public.reports;
+DROP POLICY IF EXISTS "Only admins and reviewers can update reports" ON public.reports;
+
+-- Users can view own reports, admins can view all
 CREATE POLICY "Users can view own reports, admins can view all"
   ON public.reports
   FOR SELECT
@@ -159,7 +170,6 @@ CREATE POLICY "Users can view own reports, admins can view all"
   );
 
 -- Only admins and reviewers can update reports
-DROP POLICY IF EXISTS "Only admins can update reports" ON public.reports;
 CREATE POLICY "Only admins and reviewers can update reports"
   ON public.reports
   FOR UPDATE
@@ -175,8 +185,10 @@ CREATE POLICY "Only admins and reviewers can update reports"
 -- Audit log policies
 -- =============================================
 
--- Users can view own audit logs, admins can view all
+-- Drop all existing audit_log policies first
 DROP POLICY IF EXISTS "Users can view own audit logs, admins can view all" ON public.audit_log;
+
+-- Users can view own audit logs, admins can view all
 CREATE POLICY "Users can view own audit logs, admins can view all"
   ON public.audit_log
   FOR SELECT
@@ -193,8 +205,10 @@ CREATE POLICY "Users can view own audit logs, admins can view all"
 -- User profiles policies
 -- =============================================
 
--- Admins can update any profile
+-- Drop all existing user_profiles policies first
 DROP POLICY IF EXISTS "Admins can update any profile" ON public.user_profiles;
+
+-- Admins can update any profile
 CREATE POLICY "Admins can update any profile"
   ON public.user_profiles
   FOR UPDATE
