@@ -16,16 +16,19 @@ export const bhajanService = {
     }
 
     if (searchQuery) {
-      query = query.or(`title.ilike.%${searchQuery}%,lyrics.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`)
+      query = query.or(`title.ilike.%${searchQuery}%,lyrics.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,title_kannada.ilike.%${searchQuery}%,title_devanagari.ilike.%${searchQuery}%,lyrics_kannada.ilike.%${searchQuery}%,lyrics_devanagari.ilike.%${searchQuery}%`)
     }
 
     if (tags && tags.length > 0) {
-      query = query.in('id', 
-        supabase
-          .from('bhajan_tags')
-          .select('bhajan_id')
-          .in('tag_name', tags)
-      )
+      const { data: bhajanIds } = await supabase
+        .from('bhajan_tags')
+        .select('bhajan_id')
+        .in('tag_name', tags)
+      
+      if (bhajanIds && bhajanIds.length > 0) {
+        const ids = bhajanIds.map(t => t.bhajan_id)
+        query = query.in('id', ids)
+      }
     }
 
     query = query.order(sortBy, { ascending: sortOrder === 'asc' })
@@ -35,6 +38,9 @@ export const bhajanService = {
     }
 
     const { data, error, count } = await query
+    
+    console.log('getBhajans result:', { data, error, count, filters: { status, searchQuery, tags, sortBy, sortOrder, limit, offset } })
+    
     return { data, error, count }
   },
 

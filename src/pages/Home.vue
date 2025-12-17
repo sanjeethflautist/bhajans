@@ -125,13 +125,13 @@
                 <td class="px-6 py-4">
                   <div class="flex flex-wrap gap-1">
                     <span 
-                      v-for="(tag, index) in bhajan.tags" 
-                      :key="tag"
+                      v-for="tag in bhajan.tags" 
+                      :key="tag.id || tag.tag_name"
                       class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800"
                     >
-                      {{ tag }}{{ index < bhajan.tags.length - 1 ? ',' : '' }}
+                      {{ tag.tag_name }}
                     </span>
-                    <span v-if="bhajan.tags?.length === 0" class="text-sm text-gray-400">-</span>
+                    <span v-if="!bhajan.tags || bhajan.tags.length === 0" class="text-sm text-gray-400">No tags</span>
                   </div>
                 </td>
               </tr>
@@ -250,7 +250,19 @@ async function fetchBhajansData() {
     offset: (currentPage.value - 1) * itemsPerPage
   }
 
+  console.log('Fetching bhajans with filters:', filters)
+  console.log('Auth store state:', { 
+    isEditor: authStore.isEditor, 
+    isAuthenticated: authStore.isAuthenticated,
+    user: authStore.user 
+  })
+
   await bhajanStore.fetchBhajans(filters)
+  
+  console.log('Bhajans fetched:', {
+    count: bhajanStore.totalCount,
+    data: bhajanStore.bhajans
+  })
 }
 
 function clearFilters() {
