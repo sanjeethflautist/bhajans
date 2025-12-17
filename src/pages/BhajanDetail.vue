@@ -18,7 +18,25 @@
     <div v-else-if="bhajan">
       <!-- Header -->
       <div class="card mb-6">
-        <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ bhajan.title }}</h1>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ bhajan.title }}</h1>
+        
+        <!-- Titles in other scripts -->
+        <div class="mb-4 space-y-2">
+          <h2 
+            v-if="preferencesStore.isScriptEnabled('kannada') && bhajan.title_kannada"
+            class="text-2xl font-semibold text-gray-700"
+            lang="kn"
+          >
+            {{ bhajan.title_kannada }}
+          </h2>
+          <h2 
+            v-if="preferencesStore.isScriptEnabled('devanagari') && bhajan.title_devanagari"
+            class="text-2xl font-semibold text-gray-700"
+            lang="hi"
+          >
+            {{ bhajan.title_devanagari }}
+          </h2>
+        </div>
         
         <p v-if="bhajan.description" class="text-lg text-gray-600 mb-6">
           {{ bhajan.description }}

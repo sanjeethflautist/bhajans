@@ -2,7 +2,26 @@
   <div class="card hover:shadow-lg transition-shadow cursor-pointer" @click="navigateToBhajan">
     <!-- Status Badge -->
     <div class="flex justify-between items-start mb-3">
-      <h3 class="text-xl font-bold text-gray-900 flex-1">{{ bhajan.title }}</h3>
+      <div class="flex-1">
+        <h3 class="text-xl font-bold text-gray-900">{{ bhajan.title }}</h3>
+        <!-- Additional titles in other scripts -->
+        <div class="mt-1 space-y-1">
+          <p 
+            v-if="preferencesStore.isScriptEnabled('kannada') && bhajan.title_kannada"
+            class="text-sm text-gray-600"
+            lang="kn"
+          >
+            {{ bhajan.title_kannada }}
+          </p>
+          <p 
+            v-if="preferencesStore.isScriptEnabled('devanagari') && bhajan.title_devanagari"
+            class="text-sm text-gray-600"
+            lang="hi"
+          >
+            {{ bhajan.title_devanagari }}
+          </p>
+        </div>
+      </div>
       <span
         :class="statusClasses"
         class="px-3 py-1 rounded-full text-xs font-medium ml-2"

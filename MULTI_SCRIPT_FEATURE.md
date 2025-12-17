@@ -4,7 +4,7 @@ This document describes the multi-script and meaning display features added to t
 
 ## Overview
 
-The application now supports displaying bhajan lyrics in three different scripts:
+The application now supports displaying bhajan titles and lyrics in three different scripts:
 - **English/Roman Script** (default)
 - **Kannada Script** (ಕನ್ನಡ)
 - **Devanagari Script** (देवनागरी)
@@ -13,16 +13,24 @@ Additionally, users can view the meaning/translation of bhajans when available.
 
 ## Database Changes
 
-### New Migration: `003_add_multi_script_support.sql`
+### Migrations
+
+**Migration 003:** `003_add_multi_script_support.sql`
+- Added `lyrics_kannada`, `lyrics_devanagari`, and `meaning` columns
+
+**Migration 004:** `004_add_multi_script_titles.sql`
+- Added `title_kannada` and `title_devanagari` columns
 
 Added the following columns to the `bhajans` table:
+- `title_kannada` - TEXT (nullable) - Title in Kannada script
+- `title_devanagari` - TEXT (nullable) - Title in Devanagari script
 - `lyrics_kannada` - TEXT (nullable) - Lyrics in Kannada script
 - `lyrics_devanagari` - TEXT (nullable) - Lyrics in Devanagari script  
 - `meaning` - TEXT (nullable) - Meaning or translation of the bhajan
 
-The migration also:
-- Updates full-text search indexes to include all script variants
-- Adds comments documenting each column's purpose
+The migrations also:
+- Update full-text search indexes to include all script variants (titles and lyrics)
+- Add comments documenting each column's purpose
 
 ### To Apply the Migration
 
@@ -54,19 +62,24 @@ Preferences are persisted in localStorage.
 ### 2. Updated Components
 
 #### BhajanForm Component
-- Added separate textarea fields for each script:
+- Added separate input fields for each script:
+  - Title (English/Roman) - **Required**
+  - Title (Kannada) - Optional
+  - Title (Devanagari) - Optional
   - Lyrics (English/Roman) - **Required**
   - Lyrics (Kannada) - Optional
   - Lyrics (Devanagari) - Optional
 - Added meaning/translation field
-- Form validation ensures at least English lyrics are provided
+- Form validation ensures at least English title and lyrics are provided
 
 #### BhajanCard Component
+- Displays main title (English) with additional titles below in enabled scripts
 - Displays lyrics preview in all enabled scripts
 - Shows meaning preview when enabled (in blue box)
 - Respects user preferences from the preferences store
 
 #### BhajanDetail Page
+- Displays main title with additional titles in other scripts beneath it
 - Displays full lyrics in all enabled scripts in separate sections
 - Each script section is clearly labeled
 - Shows meaning in a dedicated section when enabled
@@ -85,14 +98,16 @@ Preferences are persisted in localStorage.
 ### For Creators (Adding Bhajans)
 
 1. Navigate to Create Bhajan page
-2. Fill in required fields (Title, English lyrics)
+2. Fill in required fields (Title in English, Lyrics in English)
 3. Optionally add:
+   - Title in Kannada
+   - Title in Devanagari
    - Kannada lyrics
    - Devanagari lyrics
    - Meaning/Translation
 4. Submit bhajan
 
-**Note:** English lyrics are mandatory, other scripts and meaning are optional.
+**Note:** English title and lyrics are mandatory, other scripts and meaning are optional.
 
 ### For Viewers (Browsing Bhajans)
 

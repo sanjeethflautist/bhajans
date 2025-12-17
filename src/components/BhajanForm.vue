@@ -4,10 +4,10 @@
       {{ error }}
     </div>
 
-    <!-- Title -->
+    <!-- Title in English/Roman Script -->
     <div>
       <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
-        Title <span class="text-red-500">*</span>
+        Title (English/Roman Script) <span class="text-red-500">*</span>
       </label>
       <input
         id="title"
@@ -15,7 +15,37 @@
         type="text"
         required
         class="input-field"
-        placeholder="Enter bhajan title"
+        placeholder="Enter bhajan title in English/Roman script"
+      />
+    </div>
+
+    <!-- Title in Kannada Script -->
+    <div>
+      <label for="title-kannada" class="block text-sm font-medium text-gray-700 mb-2">
+        Title (Kannada - ಕನ್ನಡ)
+      </label>
+      <input
+        id="title-kannada"
+        v-model="formData.title_kannada"
+        type="text"
+        class="input-field"
+        placeholder="ಕನ್ನಡ ಲಿಪಿಯಲ್ಲಿ ಶೀರ್ಷಿಕೆ"
+        lang="kn"
+      />
+    </div>
+
+    <!-- Title in Devanagari Script -->
+    <div>
+      <label for="title-devanagari" class="block text-sm font-medium text-gray-700 mb-2">
+        Title (Devanagari - देवनागरी)
+      </label>
+      <input
+        id="title-devanagari"
+        v-model="formData.title_devanagari"
+        type="text"
+        class="input-field"
+        placeholder="देवनागरी लिपि में शीर्षक"
+        lang="hi"
       />
     </div>
 
@@ -175,6 +205,8 @@ const isEditMode = ref(!!props.bhajan)
 
 const formData = ref({
   title: props.bhajan?.title || '',
+  title_kannada: props.bhajan?.title_kannada || '',
+  title_devanagari: props.bhajan?.title_devanagari || '',
   description: props.bhajan?.description || '',
   lyrics: props.bhajan?.lyrics || '',
   lyrics_kannada: props.bhajan?.lyrics_kannada || '',
@@ -189,6 +221,8 @@ watch(() => props.bhajan, (newBhajan) => {
   if (newBhajan) {
     formData.value = {
       title: newBhajan.title || '',
+      title_kannada: newBhajan.title_kannada || '',
+      title_devanagari: newBhajan.title_devanagari || '',
       description: newBhajan.description || '',
       lyrics: newBhajan.lyrics || '',
       lyrics_kannada: newBhajan.lyrics_kannada || '',
