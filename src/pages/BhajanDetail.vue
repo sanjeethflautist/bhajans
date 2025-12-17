@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-4xl mx-auto px-3 sm:px-6">
+  <div class="max-w-4xl mx-auto px-2 sm:px-6">
     <!-- Loading State -->
     <div v-if="loading" class="text-center py-12">
       <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
@@ -17,7 +17,7 @@
     <!-- Bhajan Content -->
     <div v-else-if="bhajan" class="space-y-4">
       <!-- Header Card with Gradient -->
-      <div class="bg-gradient-to-br from-primary-50 to-purple-50 rounded-2xl shadow-lg p-4 sm:p-6 border border-primary-100 relative">
+      <div class="bg-gradient-to-br from-primary-50 to-purple-50 rounded-2xl shadow-lg p-3 sm:p-6 border border-primary-100 relative">
         <!-- Favorite Button -->
         <button
           @click="handleFavoriteClick"
@@ -96,7 +96,7 @@
       </div>
 
       <!-- Tags -->
-      <div v-if="bhajan.tags && bhajan.tags.length > 0" class="bg-white rounded-xl shadow-md p-4 sm:p-5 border border-gray-100">
+      <div v-if="bhajan.tags && bhajan.tags.length > 0" class="bg-white rounded-xl shadow-md p-3 sm:p-5 border border-gray-100">
         <h3 class="text-base sm:text-lg font-bold text-gray-800 mb-3 flex items-center">
           <svg class="w-5 h-5 mr-2 text-primary-500" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
@@ -123,11 +123,11 @@
           :key="script.id"
           v-show="preferencesStore.isScriptEnabled(script.id) && bhajan[script.field]"
           :class="[
-            'p-3 sm:p-5',
+            'p-2 sm:p-5',
             index > 0 && preferencesStore.scriptOptions.some((s, i) => i < index && preferencesStore.isScriptEnabled(s.id) && bhajan[s.field]) ? 'border-t border-gray-200' : ''
           ]"
         >
-          <div class="flex items-center mb-3">
+          <div class="flex items-center mb-2">
             <span class="text-xs sm:text-sm font-semibold text-primary-600 bg-primary-50 px-3 py-1 rounded-full">{{ script.label }}</span>
           </div>
           <pre 
@@ -139,7 +139,7 @@
         <!-- No lyrics available message -->
         <div 
           v-if="!hasAnyEnabledLyrics"
-          class="bg-yellow-50 p-4 sm:p-6 text-center text-gray-600"
+          class="bg-yellow-50 p-3 sm:p-6 text-center text-gray-600">
         >
           <p class="text-sm sm:text-base">No lyrics available in the selected script(s). Please select a different script from the preferences.</p>
         </div>
@@ -148,7 +148,7 @@
       <!-- Meaning Section (if enabled and available) -->
       <div 
         v-if="preferencesStore.showMeaning && bhajan.meaning" 
-        class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-md p-4 sm:p-6 border-l-4 border-blue-400"
+        class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-md p-3 sm:p-6 border-l-4 border-blue-400">
       >
         <div class="flex items-center mb-3">
           <svg class="w-5 h-5 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
