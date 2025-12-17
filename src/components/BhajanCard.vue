@@ -17,9 +17,24 @@
     </p>
 
     <!-- Lyrics Preview -->
-    <p class="text-gray-500 text-sm mb-4 line-clamp-3 italic">
-      {{ bhajan.lyrics }}
-    </p>
+    <div class="text-gray-500 text-sm mb-4 space-y-2">
+      <div v-for="script in preferencesStore.scriptOptions" :key="script.id">
+        <div 
+          v-if="preferencesStore.isScriptEnabled(script.id) && bhajan[script.field]"
+          class="line-clamp-2 italic"
+          :lang="script.id === 'kannada' ? 'kn' : script.id === 'devanagari' ? 'hi' : 'en'"
+        >
+          <span class="font-semibold text-xs text-gray-400">{{ script.label }}:</span>
+          {{ bhajan[script.field] }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Meaning Preview (if enabled) -->
+    <div v-if="preferencesStore.showMeaning && bhajan.meaning" class="text-gray-600 text-sm mb-4 p-3 bg-blue-50 rounded border-l-4 border-blue-300">
+      <span class="font-semibold text-xs text-blue-600">Meaning:</span>
+      <p class="line-clamp-2 mt-1">{{ bhajan.meaning }}</p>
+    </div>
 
     <!-- Tags -->
     <div v-if="bhajan.tags && bhajan.tags.length > 0" class="flex flex-wrap gap-2 mb-4">
@@ -73,6 +88,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
+import { usePreferencesStore } from '@/stores/preferencesStore'
 
 const props = defineProps({
   bhajan: {
@@ -89,6 +105,7 @@ defineEmits(['edit', 'delete', 'submit-review'])
 
 const router = useRouter()
 const authStore = useAuthStore()
+const preferencesStore = usePreferencesStore()
 
 const statusClasses = computed(() => {
   const classes = {

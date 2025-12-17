@@ -66,6 +66,81 @@
             Admin
           </RouterLink>
 
+          <!-- Preferences Button -->
+          <div class="relative">
+            <button
+              @click.stop="togglePreferencesMenu"
+              class="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-600 hover:text-primary-600"
+              title="Display preferences"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+
+            <!-- Preferences Dropdown -->
+            <Transition
+              enter-active-class="transition ease-out duration-100"
+              enter-from-class="transform opacity-0 scale-95"
+              enter-to-class="transform opacity-100 scale-100"
+              leave-active-class="transition ease-in duration-75"
+              leave-from-class="transform opacity-100 scale-100"
+              leave-to-class="transform opacity-0 scale-95"
+            >
+              <div
+                v-if="showPreferencesMenu"
+                @click.stop
+                class="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-xl py-3 z-50 border border-gray-200"
+              >
+                <div class="px-4 py-2 border-b border-gray-200">
+                  <h3 class="font-semibold text-gray-800">Display Preferences</h3>
+                </div>
+                
+                <!-- Script Selection -->
+                <div class="px-4 py-3 border-b border-gray-200">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Script Options</label>
+                  <div class="space-y-2">
+                    <label
+                      v-for="script in preferencesStore.scriptOptions"
+                      :key="script.id"
+                      class="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded"
+                    >
+                      <input
+                        type="checkbox"
+                        :checked="preferencesStore.isScriptEnabled(script.id)"
+                        @change="preferencesStore.toggleScript(script.id)"
+                        class="w-4 h-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500"
+                      />
+                      <span class="text-sm text-gray-700">{{ script.label }}</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Show Meaning Toggle -->
+                <div class="px-4 py-3">
+                  <label class="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded">
+                    <span class="text-sm font-medium text-gray-700">Show Meaning</span>
+                    <button
+                      @click="preferencesStore.toggleMeaning()"
+                      :class="[
+                        'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
+                        preferencesStore.showMeaning ? 'bg-primary-600' : 'bg-gray-300'
+                      ]"
+                    >
+                      <span
+                        :class="[
+                          'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+                          preferencesStore.showMeaning ? 'translate-x-6' : 'translate-x-1'
+                        ]"
+                      />
+                    </button>
+                  </label>
+                </div>
+              </div>
+            </Transition>
+          </div>
+
           <!-- User Menu -->
           <div v-if="authStore.isAuthenticated" class="relative">
             <button
@@ -185,6 +260,50 @@
               Admin
             </RouterLink>
 
+            <!-- Mobile Preferences Section -->
+            <div class="px-4 py-3 border-t border-gray-200 mt-2">
+              <h3 class="font-semibold text-gray-800 mb-3">Display Preferences</h3>
+              
+              <!-- Script Selection -->
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Script Options</label>
+                <div class="space-y-2">
+                  <label
+                    v-for="script in preferencesStore.scriptOptions"
+                    :key="script.id"
+                    class="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded"
+                  >
+                    <input
+                      type="checkbox"
+                      :checked="preferencesStore.isScriptEnabled(script.id)"
+                      @change="preferencesStore.toggleScript(script.id)"
+                      class="w-4 h-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500"
+                    />
+                    <span class="text-sm text-gray-700">{{ script.label }}</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Show Meaning Toggle -->
+              <label class="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded">
+                <span class="text-sm font-medium text-gray-700">Show Meaning</span>
+                <button
+                  @click="preferencesStore.toggleMeaning()"
+                  :class="[
+                    'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
+                    preferencesStore.showMeaning ? 'bg-primary-600' : 'bg-gray-300'
+                  ]"
+                >
+                  <span
+                    :class="[
+                      'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+                      preferencesStore.showMeaning ? 'translate-x-6' : 'translate-x-1'
+                    ]"
+                  />
+                </button>
+              </label>
+            </div>
+
             <div v-if="authStore.isAuthenticated" class="px-4 py-2 border-t border-gray-200 mt-2">
               <div class="text-sm text-gray-500 mb-2">{{ authStore.user?.email }}</div>
               <div class="text-xs bg-primary-100 text-primary-700 px-2 py-1 rounded inline-block mb-3">
@@ -221,16 +340,25 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import { useBhajanStore } from '@/stores/bhajanStore'
+import { usePreferencesStore } from '@/stores/preferencesStore'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const bhajanStore = useBhajanStore()
+const preferencesStore = usePreferencesStore()
 const showUserMenu = ref(false)
 const showMobileMenu = ref(false)
+const showPreferencesMenu = ref(false)
 const pendingReviewCount = ref(0)
 
 function toggleUserMenu() {
   showUserMenu.value = !showUserMenu.value
+  showPreferencesMenu.value = false
+}
+
+function togglePreferencesMenu() {
+  showPreferencesMenu.value = !showPreferencesMenu.value
+  showUserMenu.value = false
 }
 
 function toggleMobileMenu() {
@@ -245,9 +373,14 @@ function closeUserMenu() {
   showUserMenu.value = false
 }
 
+function closePreferencesMenu() {
+  showPreferencesMenu.value = false
+}
+
 async function handleSignOut() {
   showUserMenu.value = false
   showMobileMenu.value = false
+  showPreferencesMenu.value = false
   
   // Sign out from Supabase
   await authStore.signOut()
@@ -259,8 +392,9 @@ async function handleSignOut() {
 // Click outside to close
 function handleClickOutside(event) {
   const userMenu = event.target.closest('.relative')
-  if (!userMenu && showUserMenu.value) {
-    closeUserMenu()
+  if (!userMenu) {
+    if (showUserMenu.value) closeUserMenu()
+    if (showPreferencesMenu.value) closePreferencesMenu()
   }
 }
 

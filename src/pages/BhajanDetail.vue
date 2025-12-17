@@ -80,9 +80,40 @@
       </div>
 
       <!-- Lyrics -->
-      <div class="card">
-        <div class="bg-gray-50 p-6 rounded-lg">
-          <pre class="whitespace-pre-wrap font-serif text-gray-800 leading-relaxed text-lg">{{ bhajan.lyrics }}</pre>
+      <div class="card space-y-6">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">Lyrics</h3>
+        
+        <!-- Display lyrics in enabled scripts -->
+        <div 
+          v-for="script in preferencesStore.scriptOptions" 
+          :key="script.id"
+          v-show="preferencesStore.isScriptEnabled(script.id) && bhajan[script.field]"
+          class="bg-gray-50 p-6 rounded-lg"
+        >
+          <h4 class="text-sm font-semibold text-gray-600 mb-3">{{ script.label }}</h4>
+          <pre 
+            class="whitespace-pre-wrap font-serif text-gray-800 leading-relaxed text-lg"
+            :lang="script.id === 'kannada' ? 'kn' : script.id === 'devanagari' ? 'hi' : 'en'"
+          >{{ bhajan[script.field] }}</pre>
+        </div>
+
+        <!-- No lyrics available message -->
+        <div 
+          v-if="!hasAnyEnabledLyrics"
+          class="bg-yellow-50 p-6 rounded-lg text-center text-gray-600"
+        >
+          <p>No lyrics available in the selected script(s). Please select a different script from the preferences.</p>
+        </div>
+      </div>
+
+      <!-- Meaning Section (if enabled and available) -->
+      <div 
+        v-if="preferencesStore.showMeaning && bhajan.meaning" 
+        class="card bg-blue-50 border-l-4 border-blue-400"
+      >
+        <h3 class="text-xl font-bold text-blue-900 mb-4">Meaning</h3>
+        <div class="prose prose-blue max-w-none">
+          <pre class="whitespace-pre-wrap font-sans text-gray-800 leading-relaxed">{{ bhajan.meaning }}</pre>
         </div>
       </div>
     </div>
@@ -94,6 +125,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { useBhajanStore } from '@/stores/bhajanStore'
 import { useAuthStore } from '@/stores/authStore'
+import { usePreferencesStore } from '@/stores/preferencesStore'
 import { analyticsService } from '@/services/analyticsService'
 import ReportForm from '@/components/ReportForm.vue'
 
@@ -101,12 +133,21 @@ const route = useRoute()
 const router = useRouter()
 const bhajanStore = useBhajanStore()
 const authStore = useAuthStore()
+const preferencesStore = usePreferencesStore()
 
 const showReportForm = ref(false)
 
 const loading = computed(() => bhajanStore.loading)
 const error = computed(() => bhajanStore.error)
 const bhajan = computed(() => bhajanStore.currentBhajan)
+
+// Check if any enabled scripts have lyrics
+const hasAnyEnabledLyrics = computed(() => {
+  if (!bhajan.value) return false
+  return preferencesStore.scriptOptions.some(script => 
+    preferencesStore.isScriptEnabled(script.id) && bhajan.value[script.field]
+  )
+})
 
 const statusClasses = computed(() => {
   const classes = {

@@ -33,10 +33,10 @@
       ></textarea>
     </div>
 
-    <!-- Lyrics -->
+    <!-- Lyrics in English/Roman Script -->
     <div>
       <label for="lyrics" class="block text-sm font-medium text-gray-700 mb-2">
-        Lyrics <span class="text-red-500">*</span>
+        Lyrics (English/Roman Script) <span class="text-red-500">*</span>
       </label>
       <textarea
         id="lyrics"
@@ -44,10 +44,63 @@
         rows="10"
         required
         class="input-field font-mono"
-        placeholder="Enter the full lyrics of the bhajan"
+        placeholder="Enter the full lyrics in English/Roman script"
       ></textarea>
       <p class="text-sm text-gray-500 mt-1">
         {{ formData.lyrics.length }} characters
+      </p>
+    </div>
+
+    <!-- Lyrics in Kannada Script -->
+    <div>
+      <label for="lyrics-kannada" class="block text-sm font-medium text-gray-700 mb-2">
+        Lyrics (Kannada - ಕನ್ನಡ)
+      </label>
+      <textarea
+        id="lyrics-kannada"
+        v-model="formData.lyrics_kannada"
+        rows="10"
+        class="input-field font-mono"
+        placeholder="ಕನ್ನಡ ಲಿಪಿಯಲ್ಲಿ ಸಾಹಿತ್ಯವನ್ನು ನಮೂದಿಸಿ"
+        lang="kn"
+      ></textarea>
+      <p class="text-sm text-gray-500 mt-1">
+        {{ formData.lyrics_kannada.length }} characters
+      </p>
+    </div>
+
+    <!-- Lyrics in Devanagari Script -->
+    <div>
+      <label for="lyrics-devanagari" class="block text-sm font-medium text-gray-700 mb-2">
+        Lyrics (Devanagari - देवनागरी)
+      </label>
+      <textarea
+        id="lyrics-devanagari"
+        v-model="formData.lyrics_devanagari"
+        rows="10"
+        class="input-field font-mono"
+        placeholder="देवनागरी लिपि में गीत दर्ज करें"
+        lang="hi"
+      ></textarea>
+      <p class="text-sm text-gray-500 mt-1">
+        {{ formData.lyrics_devanagari.length }} characters
+      </p>
+    </div>
+
+    <!-- Meaning -->
+    <div>
+      <label for="meaning" class="block text-sm font-medium text-gray-700 mb-2">
+        Meaning/Translation
+      </label>
+      <textarea
+        id="meaning"
+        v-model="formData.meaning"
+        rows="5"
+        class="input-field"
+        placeholder="Enter the meaning or translation of the bhajan"
+      ></textarea>
+      <p class="text-sm text-gray-500 mt-1">
+        {{ formData.meaning.length }} characters
       </p>
     </div>
 
@@ -124,6 +177,9 @@ const formData = ref({
   title: props.bhajan?.title || '',
   description: props.bhajan?.description || '',
   lyrics: props.bhajan?.lyrics || '',
+  lyrics_kannada: props.bhajan?.lyrics_kannada || '',
+  lyrics_devanagari: props.bhajan?.lyrics_devanagari || '',
+  meaning: props.bhajan?.meaning || '',
   tags: props.bhajan?.tags?.map(t => t.tag_name) || [],
   status: props.bhajan?.status || 'draft'
 })
@@ -135,6 +191,9 @@ watch(() => props.bhajan, (newBhajan) => {
       title: newBhajan.title || '',
       description: newBhajan.description || '',
       lyrics: newBhajan.lyrics || '',
+      lyrics_kannada: newBhajan.lyrics_kannada || '',
+      lyrics_devanagari: newBhajan.lyrics_devanagari || '',
+      meaning: newBhajan.meaning || '',
       tags: newBhajan.tags?.map(t => t.tag_name) || [],
       status: newBhajan.status || 'draft'
     }
