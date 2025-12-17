@@ -80,11 +80,9 @@
 
           <!-- Lyrics in multiple scripts -->
           <div class="mb-6 space-y-4">
-            <p class="text-sm font-medium text-gray-700 mb-2">Lyrics:</p>
             
             <!-- English/Roman Script -->
             <div v-if="bhajan.lyrics" class="bg-gray-50 p-4 rounded-lg">
-              <p class="text-xs font-semibold text-gray-600 mb-2">English/Roman Script</p>
               <div class="max-h-64 overflow-y-auto">
                 <pre class="whitespace-pre-wrap font-serif text-gray-800 text-sm">{{ bhajan.lyrics }}</pre>
               </div>
@@ -92,7 +90,6 @@
 
             <!-- Kannada Script -->
             <div v-if="bhajan.lyrics_kannada" class="bg-gray-50 p-4 rounded-lg">
-              <p class="text-xs font-semibold text-gray-600 mb-2">Kannada Script</p>
               <div class="max-h-64 overflow-y-auto">
                 <pre class="whitespace-pre-wrap font-serif text-gray-800 text-sm" lang="kn">{{ bhajan.lyrics_kannada }}</pre>
               </div>
@@ -100,7 +97,6 @@
 
             <!-- Devanagari Script -->
             <div v-if="bhajan.lyrics_devanagari" class="bg-gray-50 p-4 rounded-lg">
-              <p class="text-xs font-semibold text-gray-600 mb-2">Devanagari Script</p>
               <div class="max-h-64 overflow-y-auto">
                 <pre class="whitespace-pre-wrap font-serif text-gray-800 text-sm" lang="hi">{{ bhajan.lyrics_devanagari }}</pre>
               </div>
@@ -108,7 +104,6 @@
 
             <!-- Meaning -->
             <div v-if="bhajan.meaning" class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
-              <p class="text-xs font-semibold text-blue-800 mb-2">Meaning/Translation</p>
               <div class="max-h-64 overflow-y-auto">
                 <pre class="whitespace-pre-wrap font-sans text-gray-800 text-sm">{{ bhajan.meaning }}</pre>
               </div>
